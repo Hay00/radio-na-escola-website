@@ -1,25 +1,37 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+// Router
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+
+// Páginas
+import Login from './pages/Login';
+import Main from './pages/Main';
+import Feed from './pages/Feed';
+import News from './pages/News';
+
+import GlobalStyles from './styles/GlobalStyles';
+
+// Cabeçalho e Rodapé
+import Header from './components/Header';
+import Footer from './components/Footer';
+
+import { ThemeProvider } from '@material-ui/core';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // <ThemeProvider>
+    <BrowserRouter>
+      <Header />
+      <Switch>
+        <Route exact path="/" component={Main} />
+        <Route path="/login" component={Login} />
+        <Route path="/noticias" component={Feed} />
+        <Route path="/noticia/:id" component={News} />
+      </Switch>
+      <Footer />
+      <GlobalStyles />
+    </BrowserRouter>
+    // </ThemeProvider>
   );
 }
 
