@@ -1,6 +1,11 @@
 import styled from 'styled-components';
 import { Typography } from '@material-ui/core/';
 
+export const Container = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 export const Title = styled(Typography)`
   && {
     line-height: 26px;

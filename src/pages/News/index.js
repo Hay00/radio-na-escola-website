@@ -1,12 +1,28 @@
-import React from 'react';
-import { Typography, makeStyles } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
+import {
+  Typography,
+  makeStyles,
+  CircularProgress,
+  Divider,
+} from '@material-ui/core';
 
+// Acesso ao Firestore
+import { db } from '../../config/firebaseConfig';
+
+// Icons
 import { Event, LocalOffer } from '@material-ui/icons';
+import { Container, NewsContainer, Informations, Content } from './styles';
 
-export default function News({ location }) {
+export default function News({ match }) {
   const classes = useStyles();
 
+  const [news, setNews] = useState(null);
+
   let count = 0;
+
+  useEffect(() => {
+    getData(match.params.id);
+  }, [match.params]);
 
   /**
    * Exibe o conteúdo a partir do seu tipo, se for uma imagem tem que retornar um <Image/>
@@ -40,7 +56,7 @@ export default function News({ location }) {
           <img
             key={key}
             className={classes.image}
-            src={{ uri: content.toString() }}
+            src={content.toString()}
             alt={''}
           />
         );
@@ -49,10 +65,19 @@ export default function News({ location }) {
     }
   }
 
-  if (location.news) {
-    const { id, title, image, about, data, tags, content } = location.news;
+  function getData(id) {
+    db.collection('noticias')
+      .where('id', '==', id)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          setNews(doc.data());
+        });
+      });
+  }
 
-    console.log(image);
+  if (news) {
+    const { id, title, image, about, data, tags, content } = news;
 
     let rows = [];
     content.forEach((element) => {
@@ -66,76 +91,80 @@ export default function News({ location }) {
     });
 
     return (
-      <div className={classes.root}>
-        <Typography className={classes.title} variant="h4" gutterBottom>
-          {title}
-        </Typography>
-        <img className={classes.image} src={image} alt={''} />
-        <div className={classes.about}>
-          <LocalOffer />
-          <Typography variant="caption" display="block" gutterBottom>
-            {tags}
+      <Container>
+        <NewsContainer>
+          <Typography className={classes.title} variant="h4" gutterBottom>
+            {title}
           </Typography>
-        </div>
-        <div className={classes.about}>
-          <Event />
-          <Typography variant="caption" display="block" gutterBottom>
-            {data}
-          </Typography>
-        </div>
-        <div className={classes.content}>{rows}</div>
-      </div>
+          <div>
+            <img className={classes.mainImage} src={image} alt={''} />
+          </div>
+          <Informations>
+            <LocalOffer className={classes.icon} />
+            <Typography
+              className={classes.about}
+              variant="caption"
+              display="block"
+            >
+              {tags}
+            </Typography>
+          </Informations>
+          <Informations>
+            <Event className={classes.icon} />
+            <Typography
+              className={classes.about}
+              variant="caption"
+              display="block"
+              gutterBottom
+            >
+              {data}
+            </Typography>
+          </Informations>
+          <Divider className={classes.divider} />
+          <Content>{rows}</Content>
+        </NewsContainer>
+      </Container>
     );
   } else {
     return (
       <div className={classes.root}>
-        <Typography variant="body1" gutterBottom>
-          Erro
-        </Typography>
+        <CircularProgress className={classes.loading} color={'primary'} />
       </div>
     );
   }
 }
 
 const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    maxWidth: 640,
-    margin: 'auto',
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
   },
   title: {
-    padding: '20px 10px',
+    padding: '10px 20px',
   },
   about: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'row',
-    padding: '10px 8px'
+    margin: 'auto 0px',
   },
-  line: {
-    margin: '20px 0px',
-    backgroundColor: '#A2A2A2',
-    height: 0.8,
-    width: '90%',
+  icon: {
+    paddingRight: '6px',
   },
-  content: {
-    padding: '0px 10px',
-  },
-  subTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingTop: 35,
-    paddingBottom: 15,
+  divider: {
+    margin: '20px',
   },
   text: {
+    maxWidth: '100%',
     paddingTop: '10px',
+    wordWrap: 'break-word',
+  },
+  mainImage: {
+    display: 'flex',
+    maxWidth: '100%',
+    margin: 'auto',
+    paddingBottom: '10px',
   },
   image: {
-    margin: '20px 0',
-    aspectRatio: 2,
-    width: '100%',
-    borderWidth: 0.05,
+    maxWidth: '100%',
+    margin: '15px auto',
   },
 });

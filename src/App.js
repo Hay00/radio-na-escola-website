@@ -16,6 +16,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 
 import { ThemeProvider } from '@material-ui/core';
+import AddNews from './pages/AddNews';
 
 function App() {
   return (
@@ -25,8 +26,9 @@ function App() {
       <Switch>
         <Route exact path="/" component={Main} />
         <Route path="/login" component={Login} />
-        <Route path="/noticias" component={Feed} />
-        <Route path="/noticia/:id" component={News} />
+        <Route exact path="/noticias" component={Feed} />
+        <Route path="/noticias/:id" component={News} />
+        <Route path="/add-noticia" component={AddNews} />
       </Switch>
       <Footer />
       <GlobalStyles />
