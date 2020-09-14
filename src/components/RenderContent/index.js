@@ -1,9 +1,10 @@
 import React from 'react';
 import { Container, NewsImage, Holder } from './styles';
-import ContentArrows from '../ContentArrows';
 import { TextField, IconButton } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
-import Alert from '../Alert';
+
+import ContentArrows from '../ContentArrows';
+import ImagePicker from '../ImagePicker';
 
 export default function RenderContent(props) {
   const {
@@ -38,7 +39,7 @@ export default function RenderContent(props) {
             multiline
             margin="normal"
             value={content[contentType]}
-            onChange={(e) => handleContentChange(e, index)}
+            onChange={handleContentChange(index)}
           />
           <IconButton aria-label="delete" onClick={() => removeContent(index)}>
             <Delete color={'error'} />
@@ -65,7 +66,7 @@ export default function RenderContent(props) {
             multiline
             margin="normal"
             value={content[contentType]}
-            onChange={(e) => handleContentChange(e, index)}
+            onChange={handleContentChange(index)}
           />
           <IconButton aria-label="delete" onClick={() => removeContent(index)}>
             <Delete color={'error'} />
@@ -83,19 +84,11 @@ export default function RenderContent(props) {
                 maxIndex={maxIndex}
                 onClick={moveContent}
               />
-              <TextField
-                id="image-news"
-                name={'image'}
-                label="Imagem (Link)"
-                style={{ margin: 8 }}
-                required
-                fullWidth
-                multiline
-                rowsMax={6}
-                margin="normal"
-                variant={'outlined'}
+              <ImagePicker
+                id={index}
+                placeHolder={'Adicione uma imagem'}
                 value={content[contentType]}
-                onChange={(e) => handleContentChange(e, index)}
+                onChange={handleContentChange(index)}
               />
               <IconButton
                 aria-label="delete"
@@ -104,16 +97,6 @@ export default function RenderContent(props) {
                 <Delete color={'error'} />
               </IconButton>
             </Holder>
-
-            {content[contentType] ? (
-              <img
-                style={{ height: '100%', width: '100%', objectFit: 'contain' }}
-                alt={'Imagem da Noticia'}
-                src={content[contentType]}
-              />
-            ) : (
-              <Alert severity="warning">Insira um link de uma imagem!</Alert>
-            )}
           </NewsImage>
         </Container>
       );

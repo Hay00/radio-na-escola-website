@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import {
   Container,
   News,
-  Title,
-  Url,
-  Image,
+  LargeInput,
   Informations,
-  SaveArea,
+  Save,
+  SaveButton,
 } from './styles';
 
 import {
@@ -15,7 +14,6 @@ import {
   makeStyles,
   Divider,
   InputAdornment,
-  Button,
   MenuItem,
 } from '@material-ui/core';
 
@@ -29,21 +27,24 @@ import { ptBR } from 'date-fns/locale';
 import DateFnsUtils from '@date-io/date-fns';
 
 import AddContentMenu from '../../components/AddContentMenu';
-import Alert from '../../components/Alert';
 import RenderContent from '../../components/RenderContent';
 
-import { db, timestamp } from '../../config/firebaseConfig';
+import { db } from '../../config/firebaseConfig';
+import ImagePicker from '../../components/ImagePicker';
 
-export default function AddNews() {
+export default function AddNews({ history }) {
   const classes = useStyles();
-  const [title, setTitle] = useState('');
-  const [image, setImage] = useState('');
-  const [category, setCategory] = useState('Empreendedorismo');
-  const [link, setLink] = useState('');
-  const [tags, setTags] = useState('');
-  const [time, setTime] = useState(new Date());
 
-  const [contents, setContent] = useState([]);
+  const [values, setValues] = React.useState({
+    title: '',
+    image: '',
+    category: 'Empreendedorismo',
+    link: '',
+    tags: '',
+    time: new Date(),
+  });
+
+  const [contents, setContent] = React.useState([]);
 
   const categories = [
     {
@@ -61,16 +62,38 @@ export default function AddNews() {
   ];
 
   /**
+   * Salva o que o usuário modificou (title, image, category...)
+   *
+   * @param {*} prop qual o item que está sendo alterado
+   * @param {*} event evento que contém o novo valor
+   */
+  const handleChange = (prop) => (event) => {
+    console.log('handleChange');
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
+  /**
+   * Salva a data que o usuário modificou
+   *
+   * @param {*} date data
+   */
+  const handleTimeChange = (date) => {
+    setValues({ ...values, time: date });
+  };
+
+  /**
    * Gerencia a mudança do conteúdo dos itens
    *
    * @param {*} event evento relacionado ao componente (nome, valor)
    * @param {*} key índice do item
    */
-  function handleContentChange(event, key) {
+  const handleContentChange = (key) => (event) => {
+    console.log(key);
+    console.log(event.target.name);
     let dummyState = [...contents];
     dummyState[key][event.target.name] = event.target.value;
     setContent(dummyState);
-  }
+  };
 
   /**
    * Adiciona um novo item
@@ -78,8 +101,7 @@ export default function AddNews() {
    * @param {*} type tipo de item
    */
   function addNewContent(type) {
-    let dummyState = { [type]: '' };
-    setContent([...contents, dummyState]);
+    setContent([...contents, { [type]: '' }]);
   }
 
   /**
@@ -110,8 +132,10 @@ export default function AddNews() {
   }
 
   /**
+   * Renderiza o conteúdo (subtítulo, texto, imagem)
    *
-   * @param {*} key índice do item
+   * @param {*} key índice/key do item
+   * @returns o componente
    */
   function renderContent(key) {
     return (
@@ -135,13 +159,18 @@ export default function AddNews() {
    * @returns id
    */
   function createId() {
-    let lowerTitle = title.toLowerCase().replace(/ /g, '-');
-    let date = time.toLocaleDateString();
-    return date + '/' + lowerTitle;
+    let lowerTitle = values.title
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[,.]/g, '');
+    let date = values.time.toLocaleDateString().replace(/(\/)/g, '-');
+    return date + '-' + lowerTitle;
   }
 
   /**
-   * Pega o primeiro elemento de texto para colocar no about
+   * Pega o primeiro elemento de texto para colocar no about do card
+   *
+   * @returns um objeto contento texto { texto: ' ... ' }
    */
   function getFirstText() {
     let firstText = { texto: '' };
@@ -164,23 +193,23 @@ export default function AddNews() {
     db.collection('noticias')
       .add({
         about: getFirstText(),
-        category: category,
+        category: values.category,
         content: contents,
-        data: time.toLocaleDateString('pt-BR', dateOptions),
-        createdAt: timestamp(),
+        data: values.time.toLocaleDateString('pt-BR', dateOptions),
+        createdAt: values.time,
         id: createId(),
-        image: image,
-        link: link,
-        tags: tags,
-        title: title,
+        image: values.image,
+        link: values.link,
+        tags: values.tags,
+        title: values.title,
       })
-      .then(console.log('Noticia adicionada!'));
+      .then(history.push('/noticias'));
   }
 
   return (
     <Container>
       <News>
-        <Title>
+        <LargeInput>
           <TextField
             id={'title'}
             label={'Título'}
@@ -191,36 +220,18 @@ export default function AddNews() {
             rowsMax={4}
             margin={'normal'}
             variant={'outlined'}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={values.title}
+            onChange={handleChange('title')}
           />
-        </Title>
-        <Url>
-          <TextField
-            id={'image-url'}
-            label={'Imagem da Thumbnail (Link)'}
-            className={classes.input}
-            required
-            fullWidth
-            multiline
-            rowsMax={6}
-            margin={'normal'}
-            variant={'outlined'}
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
+        </LargeInput>
+
+        <LargeInput>
+          <ImagePicker
+            placeHolder={'Adicione a imagem principal'}
+            value={values.image}
+            onChange={handleChange('image')}
           />
-        </Url>
-        {image.length > 0 ? (
-          <Image>
-            <img
-              className={classes.img}
-              alt={'Imagem de Thumbnail'}
-              src={image}
-            />
-          </Image>
-        ) : (
-          <Alert>Insira um link de uma imagem!</Alert>
-        )}
+        </LargeInput>
 
         <Informations>
           <TextField
@@ -231,8 +242,8 @@ export default function AddNews() {
             required
             fullWidth
             variant={'outlined'}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={values.category}
+            onChange={handleChange('category')}
           >
             {categories.map((option) => (
               <MenuItem key={option.category} value={option.category}>
@@ -252,8 +263,8 @@ export default function AddNews() {
             fullWidth
             margin={'normal'}
             variant={'outlined'}
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
+            value={values.link}
+            onChange={handleChange('link')}
             InputProps={{
               startAdornment: (
                 <InputAdornment position={'start'}>
@@ -274,8 +285,8 @@ export default function AddNews() {
             fullWidth
             margin={'normal'}
             variant={'outlined'}
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
+            value={values.tags}
+            onChange={handleChange('tags')}
             InputProps={{
               startAdornment: (
                 <InputAdornment position={'start'}>
@@ -295,31 +306,30 @@ export default function AddNews() {
               inputVariant={'outlined'}
               label={'Data'}
               format={'dd/MM/yyyy'}
-              value={time}
+              value={values.time}
               className={classes.input}
               InputAdornmentProps={{ position: 'end' }}
-              onChange={(date) => setTime(date)}
+              onChange={handleTimeChange}
             />
           </MuiPickersUtilsProvider>
         </Informations>
 
-        <Divider className={classes.divider} />
+        <Divider style={{ margin: '16px 0px' }} />
 
         {Object.keys(contents).map(renderContent)}
 
         <AddContentMenu onClick={addNewContent} />
 
-        <SaveArea>
-          <Button
+        <Save>
+          <SaveButton
             variant={'contained'}
             size={'large'}
-            className={classes.button}
             startIcon={<SaveIcon />}
             onClick={saveNews}
           >
             Salvar
-          </Button>
-        </SaveArea>
+          </SaveButton>
+        </Save>
       </News>
     </Container>
   );
@@ -329,22 +339,9 @@ const useStyles = makeStyles({
   input: {
     margin: '8px',
   },
-  divider: {
-    margin: '16px 0px',
-  },
   img: {
     height: '100%',
     width: '100%',
     objectFit: 'contain',
-  },
-  icon: {
-    margin: '8px',
-  },
-  button: {
-    color: '#fff',
-    backgroundColor: '#4CAF50',
-    '&:hover': {
-      backgroundColor: '#81c784',
-    },
   },
 });

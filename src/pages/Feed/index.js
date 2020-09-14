@@ -21,6 +21,7 @@ export default function Feed() {
    */
   function getData() {
     db.collection('noticias')
+      .orderBy('createdAt', 'desc')
       .get()
       .then((querySnapshot) => {
         const tempList = [];
@@ -41,12 +42,12 @@ export default function Feed() {
       <Container>
         <ButtonContainer>
           <Fab
-            className={classes.fab}
+            style={{ marginTop: '20px' }}
             variant={'extended'}
             color={'primary'}
             aria-label={'add'}
             component={Link}
-            to={'add-noticia'}
+            to={'noticias/add-noticia'}
           >
             <AddIcon />
             Nova Notícia
@@ -77,8 +78,5 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  fab: {
-    marginTop: '20px',
   },
 }));

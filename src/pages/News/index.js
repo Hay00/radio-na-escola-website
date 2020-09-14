@@ -25,8 +25,8 @@ export default function News({ match }) {
   }, [match.params]);
 
   /**
-   * Exibe o conteúdo a partir do seu tipo, se for uma imagem tem que retornar um <Image/>
-   * já se for texto <text/>, assim por diante ...
+   * Exibe o conteúdo a partir do seu tipo, se for uma imagem tem que retornar um <img/>
+   * já se for texto <Typography/>, assim por diante ...
    *
    * @param {*} type qual o tipo de conteúdo (texto,imagem,subtitulo...)
    * @param {*} content o conteúdo em si
@@ -142,6 +142,8 @@ const useStyles = makeStyles({
   },
   title: {
     padding: '10px 20px',
+    maxWidth: '100%',
+    wordWrap: 'break-word',
   },
   about: {
     margin: 'auto 0px',
