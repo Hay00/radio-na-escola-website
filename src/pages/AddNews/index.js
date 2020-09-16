@@ -160,9 +160,12 @@ export default function AddNews({ history }) {
    */
   function createId() {
     let lowerTitle = values.title
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .replace(/ /g, '-')
       .replace(/[,.]/g, '');
+
     let date = values.time.toLocaleDateString().replace(/(\/)/g, '-');
     return date + '-' + lowerTitle;
   }

@@ -6,10 +6,10 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 // Páginas
 import Login from './pages/Login';
 import Main from './pages/Main';
-import Feed from './pages/Feed';
+import FeedNews from './pages/FeedNews';
+import FeedSchools from './pages/FeedSchools';
 import News from './pages/News';
 import AddNews from './pages/AddNews';
-import Schools from './pages/Schools';
 import AddSchool from './pages/AddSchool';
 
 // Retira estilos padrões do navegador/html
@@ -29,10 +29,10 @@ function App() {
       <Switch>
         <Route exact path="/" component={Main} />
         <Route path="/login" component={Login} />
-        <Route exact path="/noticias" component={Feed} />
+        <Route exact path="/noticias" component={FeedNews} />
         <Route path="/noticias/add-noticia" component={AddNews} />
         <Route exact path="/noticias/:id" component={News} />
-        <Route exact path="/escolas" component={Schools} />
+        <Route exact path="/escolas" component={FeedSchools} />
         {/* <Route exact path="/escolas/:id" component={Schools} /> */}
         <Route path="/escolas/add-escola" component={AddSchool} />
       </Switch>

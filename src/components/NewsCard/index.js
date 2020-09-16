@@ -75,6 +75,7 @@ const useStyles = makeStyles({
   },
   cardAction: {
     padding: '8px 16px',
+    alignItems: 'center',
   },
   about: {
     width: '70%',

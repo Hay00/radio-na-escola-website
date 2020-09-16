@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import NewsCard from '../../components/NewsCard';
 
@@ -7,14 +7,19 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
 import { db } from '../../config/firebaseConfig';
+
 import { makeStyles, CircularProgress } from '@material-ui/core';
-import { Container, ButtonContainer } from './styles';
+import { Container, ButtonContainer, NewsContainer } from './styles';
 import { Link } from 'react-router-dom';
 
-export default function Feed() {
+export default function FeedNews() {
   const classes = useStyles();
 
   const [news, setNews] = useState(null);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   /**
    * Busca as notícias do firestore
@@ -33,16 +38,15 @@ export default function Feed() {
   }
 
   if (news) {
-    let rows = [];
+    let newsCards = [];
     for (let index = 0; index < news.length; index++) {
-      rows.push(<NewsCard key={index} content={news[index]} />);
+      newsCards.push(<NewsCard key={index} content={news[index]} />);
     }
 
     return (
       <Container>
         <ButtonContainer>
           <Fab
-            style={{ marginTop: '20px' }}
             variant={'extended'}
             color={'primary'}
             aria-label={'add'}
@@ -53,11 +57,10 @@ export default function Feed() {
             Nova Notícia
           </Fab>
         </ButtonContainer>
-        {rows}
+        <NewsContainer>{newsCards}</NewsContainer>
       </Container>
     );
   } else {
-    getData();
     return (
       <Container>
         <CircularProgress className={classes.loading} color={'primary'} />
@@ -68,7 +71,6 @@ export default function Feed() {
 
 const useStyles = makeStyles((theme) => ({
   loading: {
-    alignSelf: 'center',
     position: 'absolute',
     top: '50%',
     left: '50%',
