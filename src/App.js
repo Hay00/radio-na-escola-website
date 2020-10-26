@@ -19,26 +19,33 @@ import GlobalStyles from './styles/GlobalStyles';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
+// Temas 
 import { ThemeProvider } from '@material-ui/core';
+
+// Auth e Rotas privadas
+import AuthProvider from './auth';
+import PrivateRoute from './routes/PrivateRoute';
 
 function App() {
   return (
     // <ThemeProvider>
-    <BrowserRouter>
-      <Header />
-      <Switch>
-        <Route exact path="/" component={Main} />
-        <Route path="/login" component={Login} />
-        <Route exact path="/noticias" component={FeedNews} />
-        <Route path="/noticias/add-noticia" component={AddNews} />
-        <Route exact path="/noticias/:id" component={News} />
-        <Route exact path="/escolas" component={FeedSchools} />
-        {/* <Route exact path="/escolas/:id" component={Schools} /> */}
-        <Route path="/escolas/add-escola" component={AddSchool} />
-      </Switch>
-      <Footer />
-      <GlobalStyles />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Header />
+        <Switch>
+          <PrivateRoute exact path="/" component={Main} />
+          <Route exact path="/login" component={Login} />
+          <PrivateRoute exact path="/noticias" component={FeedNews} />
+          <PrivateRoute exact path="/noticias/add-noticia" component={AddNews} />
+          <PrivateRoute exact path="/noticias/:id" component={News} />
+          <PrivateRoute exact path="/escolas" component={FeedSchools} />
+          {/* <Route exact path="/escolas/:id" component={Schools} /> */}
+          <Route exact path="/escolas/add-escola" component={AddSchool} />
+        </Switch>
+        <Footer />
+        <GlobalStyles />
+      </BrowserRouter>
+    </AuthProvider>
     // </ThemeProvider>
   );
 }

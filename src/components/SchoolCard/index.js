@@ -1,14 +1,12 @@
 import React from 'react';
 
-import { Container, Title, About } from './styles';
+import { Container, Title, Image } from './styles';
 
 import {
   Card,
   CardActionArea,
-  CardMedia,
   makeStyles,
   CardContent,
-  Typography,
   Divider,
   CardActions,
   IconButton,
@@ -29,7 +27,7 @@ export default function SchoolCard(props) {
           component={Link}
           to={{ pathname: `/escolas/${id}`, news: props.content }}
         >
-          <CardMedia className={classes.media} image={image} />
+          <Image src={image} alt={`Logo ${name}`} />
           <CardContent>
             <Title gutterBottom variant={'h5'} component={'h2'}>
               {`${name} - ${radioName}`}
@@ -52,18 +50,12 @@ export default function SchoolCard(props) {
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 512,
+    maxWidth: 365,
     margin: '20px 20px',
-  },
-  media: {
-    paddingTop: '56.25%',
   },
   cardAction: {
     padding: '8px 16px',
     alignItems: 'center',
-  },
-  about: {
-    width: '70%',
   },
   icon: {
     width: '10%',

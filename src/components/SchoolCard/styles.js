@@ -14,6 +14,14 @@ export const Title = styled(Typography)`
   }
 `;
 
+export const Image = styled.img`
+  max-width: 320px;
+  object-fit: scale-down;
+  padding: 0px 20px;
+  display: flex;
+  margin: 8px auto;
+`;
+
 export const About = styled(Typography)`
   text-justify: distribute;
   overflow: hidden;

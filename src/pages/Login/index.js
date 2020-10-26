@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 
 import { Typography, TextField, Button, makeStyles } from '@material-ui/core';
 
 import { Container, Form } from './styles';
+import { app } from '../../config/firebaseConfig';
+
+import { AuthContext } from '../../auth';
+import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -14,7 +18,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Login() {
+export default function Login({ history }) {
+  const classes = useStyles();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -26,11 +32,33 @@ export default function Login() {
     }
   }
 
-  const classes = useStyles();
+  const handleLogin = useCallback(
+    async (val) => {
+      val.preventDefault();
+
+      const { email, password } = val.target.elements;
+
+      try {
+        await app
+          .auth()
+          .signInWithEmailAndPassword(email.value, password.value);
+        history.push('/');
+      } catch (error) {
+        alert(error);
+      }
+    },
+    [history]
+  );
+
+  const { currentUser } = useContext(AuthContext);
+
+  if (currentUser) {
+    return <Redirect to={'/'} />;
+  }
 
   return (
     <Container>
-      <Form>
+      <Form onSubmit={handleLogin}>
         <Typography component={'h1'} variant={'h5'}>
           Entrar
         </Typography>

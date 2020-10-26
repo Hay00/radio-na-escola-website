@@ -22,6 +22,9 @@ html {
 ul {
     list-style: none;
 }
+body{
+    padding-top: 64px
+}
 :root {
 
 }
