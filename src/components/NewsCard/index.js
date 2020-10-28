@@ -14,11 +14,14 @@ import {
   IconButton,
 } from '@material-ui/core';
 
-import { Share } from '@material-ui/icons/';
+import ShareIcon from '@material-ui/icons/Share';
+import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+
 import { Link } from 'react-router-dom';
 
 export default function NewsCard(props) {
+  const { remove } = props;
   const { id, title, image, about, tags } = props.content;
 
   const classes = useStyles();
@@ -56,8 +59,11 @@ export default function NewsCard(props) {
           <IconButton className={classes.icon} aria-label={'edit'}>
             <EditIcon color={'primary'} />
           </IconButton>
+          <IconButton onClick={remove} aria-label={'delete'}>
+            <DeleteIcon color={'error'} />
+          </IconButton>
           <IconButton className={classes.icon} aria-label={'share'}>
-            <Share color={'primary'} />
+            <ShareIcon color={'primary'} />
           </IconButton>
         </CardActions>
       </Card>

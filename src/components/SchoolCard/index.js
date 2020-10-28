@@ -12,14 +12,17 @@ import {
   IconButton,
 } from '@material-ui/core';
 
-import { Share } from '@material-ui/icons/';
+import ShareIcon from '@material-ui/icons/Share';
+import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 
 export default function SchoolCard(props) {
+  const { remove } = props;
   const { id, name, image, radioLink, radioName } = props.content;
 
   const classes = useStyles();
+
   return (
     <Container>
       <Card className={classes.root}>
@@ -36,11 +39,14 @@ export default function SchoolCard(props) {
         </CardActionArea>
         <Divider />
         <CardActions className={classes.cardAction}>
-          <IconButton className={classes.icon} aria-label={'edit'}>
+          <IconButton onClick={() => console.log('a')} aria-label={'edit'}>
             <EditIcon color={'primary'} />
           </IconButton>
-          <IconButton className={classes.icon} aria-label={'share'}>
-            <Share color={'primary'} />
+          <IconButton onClick={remove} aria-label={'delete'}>
+            <DeleteIcon color={'error'} />
+          </IconButton>
+          <IconButton onClick={() => console.log('B')} aria-label={'share'}>
+            <ShareIcon color={'primary'} />
           </IconButton>
         </CardActions>
       </Card>
@@ -55,9 +61,9 @@ const useStyles = makeStyles({
   },
   cardAction: {
     padding: '8px 16px',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   icon: {
-    width: '10%',
+    width: '100%',
   },
 });
