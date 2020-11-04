@@ -1,20 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Container, Input, Save, SaveButton } from './styles';
-import { TextField } from '@material-ui/core';
+import { Container, Input, PodcastContainer, Save, SaveButton } from './styles';
+import { Divider, Fab, TextField } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
+import AddIcon from '@material-ui/icons/Add';
 
 import { db } from '../../config/firebaseConfig';
 import Alert from '../../components/Alert';
 import ImagePicker from '../../components/ImagePicker';
+import Podcast from '../../components/Podcast';
 
 export default function AddSchool({ history }) {
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     name: '',
     image: '',
     radioLink: '',
     radioName: '',
   });
+
+  const [podcasts, setPodcasts] = useState([]);
 
   /**
    * Salva o que o usuário modificou (title, image, category...)
@@ -55,8 +59,65 @@ export default function AddSchool({ history }) {
         image: values.image,
         radioLink: values.radioLink,
         radioName: values.radioName,
+        podcasts: podcasts,
       })
       .then(history.push('/escolas'));
+  }
+
+  function addPodcast() {
+    setPodcasts([
+      ...podcasts,
+      { title: '', about: '', createdAt: new Date(), link: '' },
+    ]);
+  }
+
+  function removePodcast(key) {
+    let dummyState = [...podcasts];
+    dummyState.splice(key, 1);
+    setPodcasts([]);
+    setPodcasts(dummyState);
+  }
+
+  const handlePodcastChange = (key) => (event) => {
+    let dummyState = [...podcasts];
+    dummyState[key][event.target.name] = event.target.value;
+    setPodcasts(dummyState);
+  };
+
+  /**
+   * Salva a data que o usuário modificou
+   *
+   * @param {*} key índice do podcast
+   * @param {*} date data
+   */
+  const handleTimeChange = (key) => (date) => {
+    let dummyState = [...podcasts];
+    dummyState[key]['createdAt'] = date;
+    setPodcasts(dummyState);
+  };
+
+  /**
+   * Renderiza o conteúdo (subtítulo, texto, imagem)
+   *
+   * @param {*} key índice/key do item
+   * @returns o componente
+   */
+  function renderPodcasts(key) {
+    return (
+      <div key={key}>
+        <Divider style={{ margin: '16px 0px' }} />
+        <Podcast
+          index={parseInt(key, 10)}
+          title={podcasts[key].title}
+          about={podcasts[key].about}
+          createdAt={podcasts[key].createdAt}
+          link={podcasts[key].link}
+          handlePodcastChange={handlePodcastChange}
+          removePodcast={removePodcast}
+          handleTimeChange={handleTimeChange}
+        />
+      </div>
+    );
   }
 
   return (
@@ -113,6 +174,15 @@ export default function AddSchool({ history }) {
           onChange={handleChange('radioLink')}
         />
       </Input>
+
+      {Object.keys(podcasts).map(renderPodcasts)}
+
+      <PodcastContainer>
+        <Fab variant="extended" color={'primary'} onClick={addPodcast}>
+          <AddIcon style={{ marginRight: '8px' }} />
+          Podcast
+        </Fab>
+      </PodcastContainer>
 
       <Save>
         <SaveButton

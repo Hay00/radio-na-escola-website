@@ -17,17 +17,9 @@ export const Input = styled.div`
   margin: 8px 10px;
 `;
 
-export const ImageContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 16px;
-`;
 
-export const Img = styled.img`
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
+export const PodcastContainer = styled.div`
+  margin: 20px auto;
 `;
 
 export const Save = styled.div`

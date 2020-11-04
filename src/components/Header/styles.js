@@ -5,7 +5,7 @@ export const User = styled.div`
   justify-content: space-between;
   max-width: 300px;
   margin: 0 auto;
-  padding: 10px 0;
+  margin-right: 0px;
   @media (max-width: 768px) {
     flex-direction: column;
   }

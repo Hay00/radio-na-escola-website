@@ -40,7 +40,7 @@ function App() {
           <PrivateRoute exact path="/noticias/:id" component={News} />
           <PrivateRoute exact path="/escolas" component={FeedSchools} />
           {/* <Route exact path="/escolas/:id" component={Schools} /> */}
-          <Route exact path="/escolas/add-escola" component={AddSchool} />
+          <PrivateRoute exact path="/escolas/add-escola" component={AddSchool} />
         </Switch>
         <Footer />
         <GlobalStyles />
