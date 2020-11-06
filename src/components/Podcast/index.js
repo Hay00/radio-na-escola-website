@@ -20,6 +20,7 @@ export default function Podcast({
   index,
   title,
   about,
+  duration,
   createdAt,
   link,
   handlePodcastChange,
@@ -38,8 +39,6 @@ export default function Podcast({
             className={classes.input}
             required
             fullWidth
-            multiline
-            rowsMax={4}
             margin={'normal'}
             variant={'outlined'}
             value={title}
@@ -55,13 +54,29 @@ export default function Podcast({
             label={'Descrição'}
             placeholder={'Insira um texto'}
             variant={'outlined'}
+            required
             fullWidth
             multiline
-            margin="normal"
+            margin={'normal'}
             value={about}
             onChange={handlePodcastChange(index)}
           />
         </LargeInput>
+
+        <SmallInput>
+          <TextField
+            id={'podcasts-duration'}
+            name={'duration'}
+            label={'Duração'}
+            placeholder={'ex: 10MIN'}
+            className={classes.input}
+            required
+            margin={'normal'}
+            variant={'outlined'}
+            value={duration}
+            onChange={handlePodcastChange(index)}
+          />
+        </SmallInput>
 
         <SmallInput>
           <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>

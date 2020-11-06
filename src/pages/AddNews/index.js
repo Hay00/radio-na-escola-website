@@ -23,6 +23,7 @@ import SaveIcon from '@material-ui/icons/Save';
 
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { KeyboardDatePicker } from '@material-ui/pickers';
+
 import { ptBR } from 'date-fns/locale';
 import DateFnsUtils from '@date-io/date-fns';
 
@@ -198,7 +199,7 @@ export default function AddNews({ history }) {
         about: getFirstText(),
         category: values.category,
         content: contents,
-        data: values.time.toLocaleDateString('pt-BR', dateOptions),
+        date: values.time.toLocaleDateString('pt-BR', dateOptions),
         createdAt: values.time,
         id: createId(),
         image: values.image,

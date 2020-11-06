@@ -20,6 +20,8 @@ export default function AddSchool({ history }) {
 
   const [podcasts, setPodcasts] = useState([]);
 
+  const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
   /**
    * Salva o que o usuário modificou (title, image, category...)
    *
@@ -65,9 +67,17 @@ export default function AddSchool({ history }) {
   }
 
   function addPodcast() {
+    const date = new Date();
     setPodcasts([
       ...podcasts,
-      { title: '', about: '', createdAt: new Date(), link: '' },
+      {
+        title: '',
+        about: '',
+        duration: '',
+        createdAt: date,
+        date: date.toLocaleDateString('pt-BR', dateOptions),
+        link: '',
+      },
     ]);
   }
 
@@ -93,6 +103,7 @@ export default function AddSchool({ history }) {
   const handleTimeChange = (key) => (date) => {
     let dummyState = [...podcasts];
     dummyState[key]['createdAt'] = date;
+    dummyState[key]['date'] = date.toLocaleDateString('pt-BR', dateOptions);
     setPodcasts(dummyState);
   };
 
@@ -110,7 +121,9 @@ export default function AddSchool({ history }) {
           index={parseInt(key, 10)}
           title={podcasts[key].title}
           about={podcasts[key].about}
+          duration={podcasts[key].duration}
           createdAt={podcasts[key].createdAt}
+          date={podcasts[key].date}
           link={podcasts[key].link}
           handlePodcastChange={handlePodcastChange}
           removePodcast={removePodcast}
@@ -178,7 +191,7 @@ export default function AddSchool({ history }) {
       {Object.keys(podcasts).map(renderPodcasts)}
 
       <PodcastContainer>
-        <Fab variant="extended" color={'primary'} onClick={addPodcast}>
+        <Fab variant={'extended'} color={'primary'} onClick={addPodcast}>
           <AddIcon style={{ marginRight: '8px' }} />
           Podcast
         </Fab>
