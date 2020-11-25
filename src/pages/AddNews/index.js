@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   Container,
@@ -36,16 +36,36 @@ import ImagePicker from '../../components/ImagePicker';
 export default function AddNews({ history }) {
   const classes = useStyles();
 
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     title: '',
     image: '',
     category: 'Empreendedorismo',
     link: '',
+    schoolId: 'none',
     tags: '',
     time: new Date(),
   });
 
-  const [contents, setContent] = React.useState([]);
+  const [contents, setContent] = useState([]);
+
+  const [schools, setSchools] = useState([{ id: 'none', name: 'Nenhuma' }]);
+
+  /**
+   * Busca as escolas
+   */
+  useEffect(() => {
+    db.collection('escolas')
+      .orderBy('name', 'asc')
+      .get()
+      .then((querySnapshot) => {
+        const tempList = [];
+        tempList.push({ id: 'none', name: 'Nenhuma' });
+        querySnapshot.forEach((doc) => {
+          tempList.push(doc.data());
+        });
+        setSchools(tempList);
+      });
+  }, []);
 
   const categories = [
     {
@@ -69,7 +89,6 @@ export default function AddNews({ history }) {
    * @param {*} event evento que contém o novo valor
    */
   const handleChange = (prop) => (event) => {
-    console.log('handleChange');
     setValues({ ...values, [prop]: event.target.value });
   };
 
@@ -89,8 +108,6 @@ export default function AddNews({ history }) {
    * @param {*} key índice do item
    */
   const handleContentChange = (key) => (event) => {
-    console.log(key);
-    console.log(event.target.name);
     let dummyState = [...contents];
     dummyState[key][event.target.name] = event.target.value;
     setContent(dummyState);
@@ -204,6 +221,7 @@ export default function AddNews({ history }) {
         id: createId(),
         image: values.image,
         link: values.link,
+        schoolId: values.schoolId,
         tags: values.tags,
         title: values.title,
       })
@@ -252,6 +270,26 @@ export default function AddNews({ history }) {
             {categories.map((option) => (
               <MenuItem key={option.category} value={option.category}>
                 {option.category}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Informations>
+
+        <Informations>
+          <TextField
+            id={'schoolId'}
+            label={'Escola Relacionada'}
+            className={classes.input}
+            select
+            required
+            fullWidth
+            variant={'outlined'}
+            value={values.schoolId}
+            onChange={handleChange('schoolId')}
+          >
+            {schools.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
               </MenuItem>
             ))}
           </TextField>

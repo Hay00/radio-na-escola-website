@@ -39,7 +39,7 @@ export default function ImagePicker({
           </Image>
         ) : (
           <Empty>
-            <text style={{ margin: '60px 30px' }}>{placeHolder}</text>
+            <p style={{ margin: '60px 30px' }}>{placeHolder}</p>
           </Empty>
         )}
       </label>

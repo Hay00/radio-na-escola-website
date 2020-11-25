@@ -77,7 +77,7 @@ export default function News({ match }) {
   }
 
   if (news) {
-    const { id, title, image, about, data, tags, content } = news;
+    const { title, image, date, tags, content } = news;
 
     let rows = [];
     content.forEach((element) => {
@@ -117,7 +117,7 @@ export default function News({ match }) {
               display="block"
               gutterBottom
             >
-              {data}
+              {date}
             </Typography>
           </Informations>
           <Divider className={classes.divider} />
