@@ -6,16 +6,14 @@ import { Delete } from '@material-ui/icons';
 import ContentArrows from '../ContentArrows';
 import ImagePicker from '../ImagePicker';
 
-export default function RenderContent(props) {
-  const {
-    index,
-    content,
-    maxIndex,
-    moveContent,
-    handleContentChange,
-    removeContent,
-  } = props;
-
+export default function RenderContent({
+  index,
+  content,
+  maxIndex,
+  moveContent,
+  handleContentChange,
+  removeContent,
+}) {
   // Qual o tipo de conteúdo
   const contentType = Object.keys(content)[0];
 
@@ -39,7 +37,7 @@ export default function RenderContent(props) {
             multiline
             margin="normal"
             value={content[contentType]}
-            onChange={handleContentChange(index)}
+            onChange={(e) => handleContentChange(index, e)}
           />
           <IconButton aria-label="delete" onClick={() => removeContent(index)}>
             <Delete color={'error'} />
@@ -66,7 +64,7 @@ export default function RenderContent(props) {
             multiline
             margin="normal"
             value={content[contentType]}
-            onChange={handleContentChange(index)}
+            onChange={(e) => handleContentChange(index, e)}
           />
           <IconButton aria-label="delete" onClick={() => removeContent(index)}>
             <Delete color={'error'} />
@@ -88,7 +86,7 @@ export default function RenderContent(props) {
                 id={index}
                 placeHolder={'Adicione uma imagem'}
                 value={content[contentType]}
-                onChange={handleContentChange(index)}
+                onChange={(e) => handleContentChange(index, e)}
               />
               <IconButton
                 aria-label="delete"

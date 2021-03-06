@@ -1,36 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Typography,
-  makeStyles,
-  CircularProgress,
-  Divider,
-} from '@material-ui/core';
+import { Typography, CircularProgress, Divider } from '@material-ui/core';
 
 // Acesso ao Firestore
 import { db } from '../../config/firebaseConfig';
 
 // Icons
 import { Event, LocalOffer } from '@material-ui/icons';
-import { Container, NewsContainer, Informations, Content } from './styles';
+import {
+  Container,
+  NewsContainer,
+  Information,
+  Content,
+  Title,
+  Image,
+  Text,
+} from './styles';
 
 export default function News({ match }) {
-  const classes = useStyles();
-
   const [news, setNews] = useState(null);
 
-  let count = 0;
-
+  /**
+   * Busca a notícia pelo id da url
+   */
   useEffect(() => {
-    getData(match.params.id);
+    db.collection('noticias')
+      .where('id', '==', match.params.id)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          setNews(doc.data());
+        });
+      });
   }, [match.params]);
 
   /**
    * Exibe o conteúdo a partir do seu tipo, se for uma imagem tem que retornar um <img/>
    * já se for texto <Typography/>, assim por diante ...
    *
-   * @param {*} type qual o tipo de conteúdo (texto,imagem,subtitulo...)
-   * @param {*} content o conteúdo em si
-   * @param {*} key key
+   * @param {String} type qual o tipo de conteúdo (texto,imagem,subtitulo...)
+   * @param {String} content o conteúdo em si
+   * @param {Number} key key
    */
   function componentProvider(type, content, key) {
     switch (type) {
@@ -42,20 +51,15 @@ export default function News({ match }) {
         );
       case 'texto':
         return (
-          <Typography
-            className={classes.text}
-            key={key}
-            variant="body1"
-            gutterBottom
-          >
+          <Text key={key} variant="body1" gutterBottom>
             {content}
-          </Typography>
+          </Text>
         );
       case 'image':
         return (
           <img
             key={key}
-            className={classes.image}
+            style={{ maxWidth: '100%', margin: '15px auto' }}
             src={content.toString()}
             alt={''}
           />
@@ -65,108 +69,55 @@ export default function News({ match }) {
     }
   }
 
-  function getData(id) {
-    db.collection('noticias')
-      .where('id', '==', id)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          setNews(doc.data());
-        });
-      });
-  }
-
   if (news) {
     const { title, image, date, tags, content } = news;
-
-    let rows = [];
-    content.forEach((element) => {
-      rows.push(
-        componentProvider(
-          Object.keys(element).toString(),
-          Object.values(element),
-          count++
-        )
-      );
-    });
 
     return (
       <Container>
         <NewsContainer>
-          <Typography className={classes.title} variant="h4" gutterBottom>
+          <Title variant="h4" gutterBottom>
             {title}
-          </Typography>
+          </Title>
           <div>
-            <img className={classes.mainImage} src={image} alt={''} />
+            <Image src={image} alt={'Imagem da notícia'} />
           </div>
-          <Informations>
-            <LocalOffer className={classes.icon} />
+          <Information>
+            <LocalOffer style={{ paddingRight: '6px' }} />
             <Typography
-              className={classes.about}
+              style={{ margin: 'auto 0px' }}
               variant="caption"
               display="block"
             >
               {tags}
             </Typography>
-          </Informations>
-          <Informations>
-            <Event className={classes.icon} />
+          </Information>
+          <Information>
+            <Event style={{ paddingRight: '6px' }} />
             <Typography
-              className={classes.about}
+              style={{ margin: 'auto 0px' }}
               variant="caption"
               display="block"
               gutterBottom
             >
               {date}
             </Typography>
-          </Informations>
-          <Divider className={classes.divider} />
-          <Content>{rows}</Content>
+          </Information>
+          <Divider style={{ margin: '20px' }} />
+          <Content>
+            {content.map((element, index) => {
+              const type = Object.keys(element).toString();
+              const values = Object.values(element);
+              return componentProvider(type, values, index);
+            })}
+          </Content>
         </NewsContainer>
       </Container>
     );
   } else {
     return (
-      <div className={classes.root}>
-        <CircularProgress className={classes.loading} color={'primary'} />
+      <div style={{ position: 'absolute', top: '50%', left: '50%' }}>
+        <CircularProgress color={'primary'} />
       </div>
     );
   }
 }
-
-const useStyles = makeStyles({
-  loading: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-  },
-  title: {
-    padding: '10px 20px',
-    maxWidth: '100%',
-    wordWrap: 'break-word',
-  },
-  about: {
-    margin: 'auto 0px',
-  },
-  icon: {
-    paddingRight: '6px',
-  },
-  divider: {
-    margin: '20px',
-  },
-  text: {
-    maxWidth: '100%',
-    paddingTop: '10px',
-    wordWrap: 'break-word',
-  },
-  mainImage: {
-    display: 'flex',
-    maxWidth: '100%',
-    margin: 'auto',
-    paddingBottom: '10px',
-  },
-  image: {
-    maxWidth: '100%',
-    margin: '15px auto',
-  },
-});

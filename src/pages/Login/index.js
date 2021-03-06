@@ -1,36 +1,16 @@
 import React, { useCallback, useState, useContext } from 'react';
 
-import { Typography, TextField, Button, makeStyles } from '@material-ui/core';
+import { Typography, TextField, Button } from '@material-ui/core';
 
 import { Container, Form } from './styles';
-import { app } from '../../config/firebaseConfig';
+import { auth } from '../../config/firebaseConfig';
 
 import { AuthContext } from '../../auth';
 import { Redirect } from 'react-router-dom';
 
-const useStyles = makeStyles((theme) => ({
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
 export default function Login({ history }) {
-  const classes = useStyles();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  function handleChange(e) {
-    if (e.target.name === 'email') {
-      setEmail(e.target.value);
-    } else {
-      setPassword(e.target.value);
-    }
-  }
 
   const handleLogin = useCallback(
     async (val) => {
@@ -39,9 +19,7 @@ export default function Login({ history }) {
       const { email, password } = val.target.elements;
 
       try {
-        await app
-          .auth()
-          .signInWithEmailAndPassword(email.value, password.value);
+        await auth.signInWithEmailAndPassword(email.value, password.value);
         history.push('/');
       } catch (error) {
         alert(error);
@@ -51,7 +29,6 @@ export default function Login({ history }) {
   );
 
   const { currentUser } = useContext(AuthContext);
-
   if (currentUser) {
     return <Redirect to={'/'} />;
   }
@@ -73,7 +50,7 @@ export default function Login({ history }) {
           autoComplete={'email'}
           autoFocus
           value={email}
-          onChange={handleChange}
+          onChange={({ target }) => setEmail(target.value)}
         />
         <TextField
           variant={'outlined'}
@@ -86,14 +63,14 @@ export default function Login({ history }) {
           id={'password'}
           autoComplete={'current-password'}
           value={password}
-          onChange={handleChange}
+          onChange={({ target }) => setPassword(target.value)}
         />
         <Button
           type={'submit'}
           fullWidth
           variant={'contained'}
           color={'primary'}
-          className={classes.submit}
+          style={{ margin: '24px 0px 16px' }}
         >
           Entrar
         </Button>

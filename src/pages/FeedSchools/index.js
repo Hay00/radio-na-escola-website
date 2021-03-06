@@ -19,19 +19,31 @@ import SchoolCard from '../../components/SchoolCard';
 
 export default function FeedSchools() {
   const [schools, setSchools] = useState(null);
-  const [docIDs, setDocIDs] = useState(null);
 
   const [toRemove, setToRemove] = useState({ uid: null, id: null });
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
+  /**
+   * Buscando as escolas do firestore
+   */
   useEffect(() => {
-    getData();
+    db.collection('escolas')
+      .orderBy('name', 'asc')
+      .get()
+      .then((snapshot) => {
+        const data = [];
+        snapshot.forEach((doc) => {
+          data.push({ docId: doc.id, ...doc.data() });
+        });
+        setSchools(data);
+      });
   }, []);
 
   /**
    * Abre um diálogo perguntando sobre a remoção da escola
    *
-   * @param {*} docId escola que irá ser removida
+   * @param {String} docId id do documento da escola
+   * @param {String} id id padrão da escola
    */
   function openDialog(docId, id) {
     setOpen(true);
@@ -48,42 +60,15 @@ export default function FeedSchools() {
     handleClose();
   }
 
+  /**
+   * Fecha o modal
+   */
   function handleClose() {
     setToRemove({ uid: null, id: null });
     setOpen(false);
   }
 
-  /**
-   * Busca as notícias do firestore
-   */
-  function getData() {
-    db.collection('escolas')
-      .orderBy('name', 'asc')
-      .get()
-      .then((querySnapshot) => {
-        const tempList = [];
-        const ids = [];
-        querySnapshot.forEach((doc) => {
-          tempList.push(doc.data());
-          ids.push(doc.id);
-        });
-        setDocIDs(ids);
-        setSchools(tempList);
-      });
-  }
-
   if (schools) {
-    let schoolsCards = [];
-    for (let index = 0; index < schools.length; index++) {
-      schoolsCards.push(
-        <SchoolCard
-          key={index}
-          remove={() => openDialog(docIDs[index], schools[index].id)}
-          content={schools[index]}
-        />
-      );
-    }
-
     return (
       <Container>
         <ButtonContainer>
@@ -98,7 +83,15 @@ export default function FeedSchools() {
             Nova Escola
           </Fab>
         </ButtonContainer>
-        <SchoolsContainer>{schoolsCards}</SchoolsContainer>
+        <SchoolsContainer>
+          {schools.map((value) => (
+            <SchoolCard
+              key={value.id}
+              remove={() => openDialog(value.docId, value.id)}
+              content={value}
+            />
+          ))}
+        </SchoolsContainer>
         <Dialog
           open={open}
           onClose={handleClose}

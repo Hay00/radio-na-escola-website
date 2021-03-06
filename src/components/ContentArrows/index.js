@@ -1,16 +1,17 @@
 import React from 'react';
+
 import { IconButton } from '@material-ui/core';
-
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 
-export default function ContentArrows(props) {
-  let { index, maxIndex, onClick } = props;
+import { Container } from './styles';
+
+export default function ContentArrows({ index, maxIndex, onClick }) {
   const arrowUpEnabled = index > 0;
   const arrowDownEnabled = index < maxIndex - 1;
 
   return (
-    <div style={{ display: 'flex', flexDirection:'column'}}>
+    <Container>
       <IconButton
         aria-label={'move-up'}
         size={'small'}
@@ -27,6 +28,6 @@ export default function ContentArrows(props) {
       >
         <ArrowDropDownIcon fontSize={'large'} />
       </IconButton>
-    </div>
+    </Container>
   );
 }

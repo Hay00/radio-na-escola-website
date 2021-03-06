@@ -1,43 +1,58 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+
 import {
-  MenuItem,
+  ClickAwayListener,
+  Fab,
+  Grow,
   ListItemIcon,
   ListItemText,
-  Popper,
-  Grow,
-  Paper,
-  ClickAwayListener,
+  MenuItem,
   MenuList,
-  Fab,
+  Paper,
+  Popper,
 } from '@material-ui/core';
 
 import AddIcon from '@material-ui/icons/Add';
-import TitleIcon from '@material-ui/icons/Title';
-import TextFieldsIcon from '@material-ui/icons/TextFields';
 import ImageIcon from '@material-ui/icons/Image';
+import TextFieldsIcon from '@material-ui/icons/TextFields';
+import TitleIcon from '@material-ui/icons/Title';
 
 import { Container } from './styles';
 
-export default function AddContentMenu(props) {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
+export default function AddContentMenu({ onClick }) {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
 
+  /**
+   * Alterna entre o estado de aberto
+   */
   function handleToggle() {
     setOpen((prevOpen) => !prevOpen);
   }
 
+  /**
+   * Fecha o componente
+   * @param {Event} event evento do componente
+   */
   function handleClose(event) {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
-      return;
+    if (!anchorRef.current && !anchorRef.current.contains(event.target)) {
+      setOpen(false);
     }
-    setOpen(false);
   }
 
+  /**
+   * Seleciona um tipos de conteúdo
+   * @param {String} type tipo do conteúdo
+   */
   function handleClick(type) {
-    props.onClick(type);
+    onClick(type);
     setOpen(false);
   }
 
+  /**
+   * Ao clicar na tecla tab é fechado o menú
+   * @param {Event} event
+   */
   function handleListKeyDown(event) {
     if (event.key === 'Tab') {
       event.preventDefault();

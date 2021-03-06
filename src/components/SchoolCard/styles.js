@@ -1,11 +1,15 @@
 import styled from 'styled-components';
-import { Typography } from '@material-ui/core';
+import { Card, CardActions, Typography } from '@material-ui/core';
 
 export const Container = styled.div`
   @media (max-width: 768px) {
     display: flex;
     justify-content: center;
   }
+`;
+export const MyCard = styled(Card)`
+  width: 400px;
+  margin: 20px 20px;
 `;
 
 export const Title = styled(Typography)`
@@ -15,10 +19,12 @@ export const Title = styled(Typography)`
 `;
 
 export const Image = styled.img`
-  max-width: 320px;
-  object-fit: scale-down;
-  padding: 0px 20px;
   display: flex;
+  aspect-ratio: 1;
+  width: 80%;
+  height: auto;
+  align-self: center;
+  object-fit: scale-down;
   margin: 8px auto;
 `;
 
@@ -29,4 +35,9 @@ export const About = styled(Typography)`
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+`;
+
+export const Actions = styled(CardActions)`
+  padding: 8px 16px;
+  align-items: center;
 `;

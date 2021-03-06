@@ -15,27 +15,37 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import { db } from '../../config/firebaseConfig';
 
-import { makeStyles, CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import { Container, ButtonContainer, NewsContainer } from './styles';
 import { Link } from 'react-router-dom';
 
 export default function FeedNews() {
-  const classes = useStyles();
-
   const [news, setNews] = useState(null);
-  const [docIDs, setDocIDs] = useState(null);
 
   const [toRemove, setToRemove] = useState({ uid: null, id: null });
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
+  /**
+   * Busca as notícias do firestore
+   */
   useEffect(() => {
-    getData();
+    db.collection('noticias')
+      .orderBy('createdAt', 'desc')
+      .get()
+      .then((snapshot) => {
+        const data = [];
+        snapshot.forEach((doc) => {
+          data.push({ docId: doc.id, ...doc.data() });
+        });
+        setNews(data);
+      });
   }, []);
 
   /**
    * Abre um diálogo perguntando sobre a remoção da notícia
    *
-   * @param {*} docId noticia a ser deletada
+   * @param {String} docId id do documento da notícia
+   * @param {String} id id padrão da notícia
    */
   function openDialog(docId, id) {
     setOpen(true);
@@ -52,42 +62,15 @@ export default function FeedNews() {
     handleClose();
   }
 
+  /**
+   * Fecha o modal
+   */
   function handleClose() {
     setToRemove({ uid: null, id: null });
     setOpen(false);
   }
 
-  /**
-   * Busca as notícias do firestore
-   */
-  function getData() {
-    db.collection('noticias')
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then((querySnapshot) => {
-        const tempList = [];
-        const ids = [];
-        querySnapshot.forEach((doc) => {
-          tempList.push(doc.data());
-          ids.push(doc.id);
-        });
-        setDocIDs(ids);
-        setNews(tempList);
-      });
-  }
-
   if (news) {
-    let newsCards = [];
-    for (let index = 0; index < news.length; index++) {
-      newsCards.push(
-        <NewsCard
-          key={index}
-          remove={() => openDialog(docIDs[index], news[index].id)}
-          content={news[index]}
-        />
-      );
-    }
-
     return (
       <Container>
         <ButtonContainer>
@@ -102,7 +85,15 @@ export default function FeedNews() {
             Nova Notícia
           </Fab>
         </ButtonContainer>
-        <NewsContainer>{newsCards}</NewsContainer>
+        <NewsContainer>
+          {news.map((value) => (
+            <NewsCard
+              key={value.id}
+              remove={() => openDialog(value.docId, value.id)}
+              content={value}
+            />
+          ))}
+        </NewsContainer>
         <Dialog
           open={open}
           onClose={handleClose}
@@ -137,22 +128,11 @@ export default function FeedNews() {
   } else {
     return (
       <Container>
-        <CircularProgress className={classes.loading} color={'primary'} />
+        <CircularProgress
+          style={{ position: 'absolute', top: '50%', left: '50%' }}
+          color={'primary'}
+        />
       </Container>
     );
   }
 }
-
-const useStyles = makeStyles((theme) => ({
-  loading: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-}));

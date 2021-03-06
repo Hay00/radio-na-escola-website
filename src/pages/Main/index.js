@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Container } from './styles';
-import { db } from '../../config/firebaseConfig';
+// import { db } from '../../config/firebaseConfig';
 
 export default function Main() {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container, Image, Empty } from './styles';
+import { Container, Empty, Image } from './styles';
 
 export default function ImagePicker({
   id,
@@ -8,15 +8,19 @@ export default function ImagePicker({
   value,
   onChange,
 }) {
-  const onChooseFile = (event) => {
-    if (event.target.files[0]) {
+  /**
+   * Transforma a imagem selecionada para base64
+   * @param {Event} event evento do componente
+   */
+  function onChooseFile({ target }) {
+    if (target.files[0]) {
       let reader = new FileReader();
-      reader.readAsDataURL(event.target.files[0]);
+      reader.readAsDataURL(target.files[0]);
       reader.onload = (data) => {
         onChange({ target: { name: 'image', value: data.target.result } });
       };
     }
-  };
+  }
 
   return (
     <Container>

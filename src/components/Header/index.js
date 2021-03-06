@@ -1,147 +1,116 @@
 import React, { useContext, useState } from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import Link from '@material-ui/core/Link';
-
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import MenuIcon from '@material-ui/icons/Menu';
 import { Link as RouterLink } from 'react-router-dom';
-
 import { AuthContext } from '../../auth';
-import { app } from '../../config/firebaseConfig';
-import { User } from './styles';
+import { auth } from '../../config/firebaseConfig';
+import { LoginButton, User } from './styles';
 
 export default function Header() {
-  const classes = useStyles();
-
-  const [openMenu, setOpenMenu] = useState(false);
-
   const { currentUser } = useContext(AuthContext);
 
+  const [openMenu, setOpenMenu] = useState(null);
+
+  /**
+   * Faz o logout do usuário
+   */
   function singOut() {
-    app.auth().signOut();
+    auth.signOut();
     handleClose();
   }
 
-  const handleClick = (event) => {
+  /**
+   * Associa o componente aberto
+   * @param {Event} event evento do componente
+   */
+  function handleClick(event) {
     setOpenMenu(event.currentTarget);
-  };
+  }
 
-  const handleClose = () => {
-    setOpenMenu(false);
-  };
+  /**
+   * Fecha o componente
+   */
+  function handleClose() {
+    setOpenMenu(null);
+  }
 
   return (
-    <div className={classes.root}>
-      <AppBar position={'fixed'}>
-        <Toolbar>
-          <IconButton
-            edge={'start'}
-            className={classes.menuButton}
+    <AppBar position={'fixed'}>
+      <Toolbar>
+        <IconButton
+          edge={'start'}
+          style={{ marginRight: '16px' }}
+          color={'inherit'}
+          aria-label={'menu'}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography style={{ marginLeft: '16px', textDecoration: 'underline' }}>
+          <Link
             color={'inherit'}
-            aria-label={'menu'}
+            variant={'h6'}
+            component={RouterLink}
+            to={'/noticias'}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography className={classes.links}>
-            <Link
-              color={'inherit'}
-              variant={'h6'}
-              component={RouterLink}
-              to={'/noticias'}
-            >
-              Notícias
-            </Link>
-            <Link
-              color={'inherit'}
-              variant={'h6'}
-              component={RouterLink}
-              to={'/escolas'}
-            >
-              Escolas
-            </Link>
-          </Typography>
+            Notícias
+          </Link>
+        </Typography>
+        <Typography style={{ marginLeft: '16px', textDecoration: 'underline' }}>
+          <Link
+            color={'inherit'}
+            variant={'h6'}
+            component={RouterLink}
+            to={'/escolas'}
+          >
+            Escolas
+          </Link>
+        </Typography>
 
-          {!currentUser ? (
-            <Button
-              className={classes.login}
-              variant={'contained'}
-              color={'secondary'}
-              component={RouterLink}
-              to={'login'}
+        {currentUser ? (
+          <User>
+            <IconButton
+              aria-label="more"
+              aria-controls="long-menu"
+              aria-haspopup="true"
+              onClick={handleClick}
             >
-              Entrar
-            </Button>
-          ) : (
-            <User>
-              <IconButton
-                aria-label="more"
-                aria-controls="long-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
+              <AccountCircleIcon
+                fontSize={'large'}
+                style={{ color: 'white' }}
+              />
+            </IconButton>
+            <Menu
+              id="user-menu"
+              style={{ marginTop: '60px' }}
+              anchorEl={openMenu}
+              keepMounted
+              open={Boolean(openMenu)}
+              onClose={handleClose}
+            >
+              <Typography
+                style={{ padding: '6px 16px' }}
+                variant="subtitle1"
+                gutterBottom
               >
-                <AccountCircleIcon
-                  fontSize={'large'}
-                  style={{ color: 'white' }}
-                />
-              </IconButton>
-              <Menu
-                id="user-menu"
-                className={classes.singOut}
-                anchorEl={openMenu}
-                keepMounted
-                open={Boolean(openMenu)}
-                onClose={handleClose}
-              >
-                <Typography
-                  className={classes.item}
-                  variant="subtitle1"
-                  gutterBottom
-                >
-                  {currentUser.email}
-                </Typography>
-                <MenuItem onClick={singOut}>Sair</MenuItem>
-              </Menu>
-            </User>
-          )}
-        </Toolbar>
-      </AppBar>
-    </div>
+                {currentUser.email}
+              </Typography>
+              <MenuItem onClick={singOut}>Sair</MenuItem>
+            </Menu>
+          </User>
+        ) : (
+          <LoginButton component={RouterLink} to={'login'}>
+            Entrar
+          </LoginButton>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  links: {
-    '& > * + *': {
-      marginLeft: theme.spacing(2),
-    },
-    textDecoration: 'underline',
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  login: {
-    margin: 'auto',
-    marginRight: '0px',
-  },
-  singOut: {
-    marginTop: '60px',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  item: {
-    padding: '6px 16px',
-  },
-}));

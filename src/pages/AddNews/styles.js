@@ -27,7 +27,7 @@ export const Image = styled.div`
   margin: 16px;
 `;
 
-export const Informations = styled.div`
+export const Information = styled.div`
   display: flex;
   align-items: center;
   justify-content: baseline;

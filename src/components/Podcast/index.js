@@ -1,20 +1,18 @@
 import React from 'react';
 
-import {
-  IconButton,
-  InputAdornment,
-  makeStyles,
-  TextField,
-} from '@material-ui/core';
-import LinkIcon from '@material-ui/icons/Link';
-
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { KeyboardDatePicker } from '@material-ui/pickers';
-import { ptBR } from 'date-fns/locale';
 import DateFnsUtils from '@date-io/date-fns';
 
-import { Container, Content, LargeInput, SmallInput } from './styles';
+import { IconButton, InputAdornment, TextField } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
+import LinkIcon from '@material-ui/icons/Link';
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from '@material-ui/pickers';
+
+import { ptBR } from 'date-fns/locale';
+
+import { Container, Content, LargeInput, SmallInput } from './styles';
 
 export default function Podcast({
   index,
@@ -27,7 +25,6 @@ export default function Podcast({
   removePodcast,
   handleTimeChange,
 }) {
-  const classes = useStyles();
   return (
     <Container>
       <Content>
@@ -36,7 +33,7 @@ export default function Podcast({
             id={'podcasts-title'}
             name={'title'}
             label={'Título'}
-            className={classes.input}
+            style={{ margin: '8px' }}
             required
             fullWidth
             margin={'normal'}
@@ -69,7 +66,7 @@ export default function Podcast({
             name={'duration'}
             label={'Duração'}
             placeholder={'ex: 10MIN'}
-            className={classes.input}
+            style={{ margin: '8px' }}
             required
             margin={'normal'}
             variant={'outlined'}
@@ -89,7 +86,7 @@ export default function Podcast({
               label={'Data'}
               format={'dd/MM/yyyy'}
               value={createdAt}
-              className={classes.input}
+              style={{ margin: '8px' }}
               InputAdornmentProps={{ position: 'end' }}
               onChange={handleTimeChange(index)}
             />
@@ -102,7 +99,7 @@ export default function Podcast({
             name={'link'}
             label={'Link URL'}
             placeholder={'www.link-do-podcast/radio.mp3'}
-            className={classes.input}
+            style={{ margin: '8px' }}
             required
             fullWidth
             margin={'normal'}
@@ -121,7 +118,7 @@ export default function Podcast({
       </Content>
       <IconButton
         aria-label={'delete'}
-        className={classes.button}
+        style={{ margin: 'auto' }}
         onClick={() => removePodcast(index)}
       >
         <Delete color={'error'} />
@@ -129,17 +126,3 @@ export default function Podcast({
     </Container>
   );
 }
-
-const useStyles = makeStyles({
-  input: {
-    margin: '8px',
-  },
-  button: {
-    margin: 'auto',
-  },
-  img: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'contain',
-  },
-});

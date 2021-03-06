@@ -25,13 +25,17 @@ export default function AddSchool({ history }) {
   /**
    * Salva o que o usuário modificou (title, image, category...)
    *
-   * @param {*} prop qual o item que está sendo alterado
-   * @param {*} event evento que contém o novo valor
+   * @param {String} prop qual o item que está sendo alterado
+   * @param {Event} event evento que contém o novo valor
    */
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
 
+  /**
+   * Cria um id a partir das informações disponibilizadas
+   * @returns id da escola
+   */
   function createId() {
     let name = values.name
       .normalize('NFD')
@@ -57,15 +61,15 @@ export default function AddSchool({ history }) {
     db.collection('escolas')
       .add({
         id: createId(),
-        name: values.name,
-        image: values.image,
-        radioLink: values.radioLink,
-        radioName: values.radioName,
         podcasts: podcasts,
+        ...values,
       })
       .then(history.push('/escolas'));
   }
 
+  /**
+   * Adiciona um novo podcast
+   */
   function addPodcast() {
     const date = new Date();
     setPodcasts([
@@ -81,13 +85,20 @@ export default function AddSchool({ history }) {
     ]);
   }
 
+  /**
+   * Remove um por índice podcast
+   * @param {Number} key índice do podcast a ser removido
+   */
   function removePodcast(key) {
     let dummyState = [...podcasts];
     dummyState.splice(key, 1);
-    setPodcasts([]);
     setPodcasts(dummyState);
   }
 
+  /**
+   * Altera algum valor do podcast
+   * @param {Number} key  índice do podcast
+   */
   const handlePodcastChange = (key) => (event) => {
     let dummyState = [...podcasts];
     dummyState[key][event.target.name] = event.target.value;
@@ -97,8 +108,8 @@ export default function AddSchool({ history }) {
   /**
    * Salva a data que o usuário modificou
    *
-   * @param {*} key índice do podcast
-   * @param {*} date data
+   * @param {Number} key índice do podcast
+   * @param {Date} date data
    */
   const handleTimeChange = (key) => (date) => {
     let dummyState = [...podcasts];
@@ -110,21 +121,22 @@ export default function AddSchool({ history }) {
   /**
    * Renderiza o conteúdo (subtítulo, texto, imagem)
    *
-   * @param {*} key índice/key do item
+   * @param {Number} key índice/key do item
    * @returns o componente
    */
   function renderPodcasts(key) {
+    const { title, about, duration, createdAt, date, link } = podcasts[key];
     return (
       <div key={key}>
         <Divider style={{ margin: '16px 0px' }} />
         <Podcast
           index={parseInt(key, 10)}
-          title={podcasts[key].title}
-          about={podcasts[key].about}
-          duration={podcasts[key].duration}
-          createdAt={podcasts[key].createdAt}
-          date={podcasts[key].date}
-          link={podcasts[key].link}
+          title={title}
+          about={about}
+          duration={duration}
+          createdAt={createdAt}
+          date={date}
+          link={link}
           handlePodcastChange={handlePodcastChange}
           removePodcast={removePodcast}
           handleTimeChange={handleTimeChange}

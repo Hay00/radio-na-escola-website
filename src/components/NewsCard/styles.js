@@ -1,11 +1,21 @@
 import styled from 'styled-components';
-import { Typography } from '@material-ui/core/';
+import { Card, CardActions, Typography } from '@material-ui/core/';
 
 export const Container = styled.div`
   @media (max-width: 768px) {
     display: flex;
     justify-content: center;
   }
+`;
+
+export const MyCard = styled(Card)`
+  max-width: 512px;
+  margin: 20px 20px;
+`;
+
+export const Actions = styled(CardActions)`
+  padding: 8px 16px;
+  align-items: center;
 `;
 
 export const Title = styled(Typography)`
