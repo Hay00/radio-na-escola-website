@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 export const Container = styled.main`
   @media (min-width: 600px) {
@@ -20,19 +21,27 @@ export const LargeInput = styled.div`
   margin: 8px 10px;
 `;
 
-export const Image = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 16px;
-`;
-
-export const Information = styled.div`
+export const SmallInput = styled.div`
   display: flex;
   align-items: center;
   justify-content: baseline;
   max-width: 500px;
   margin: 8px 10px;
+`;
+
+export const TextInput = styled(TextField).attrs(() => ({
+  required: true,
+  fullWidth: true,
+  variant: 'outlined',
+}))`
+  margin: 8px;
+`;
+
+export const Image = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px;
 `;
 
 export const Save = styled.div`

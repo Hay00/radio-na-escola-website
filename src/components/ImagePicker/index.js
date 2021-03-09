@@ -4,6 +4,7 @@ import { Container, Empty, Image } from './styles';
 
 export default function ImagePicker({
   id,
+  error,
   placeHolder = 'Selecione uma Imagem',
   value,
   onChange,
@@ -42,7 +43,7 @@ export default function ImagePicker({
             />
           </Image>
         ) : (
-          <Empty>
+          <Empty error={error}>
             <p style={{ margin: '60px 30px' }}>{placeHolder}</p>
           </Empty>
         )}

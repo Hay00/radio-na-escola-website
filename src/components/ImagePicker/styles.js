@@ -23,7 +23,7 @@ export const Empty = styled.div`
   justify-content: center;
   align-items: center;
   border: solid;
-  border-color: rgba(0, 0, 0, 0.23);
+  border-color: ${({ error }) => (error ? '#f44336' : '#0000003b')};
   border-width: 1px;
   border-radius: 4px;
 

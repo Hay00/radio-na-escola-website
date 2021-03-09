@@ -1,13 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
+// Componentes material-ui
 import DateFnsUtils from '@date-io/date-fns';
-
-import {
-  Divider,
-  InputAdornment,
-  MenuItem,
-  TextField,
-} from '@material-ui/core';
+import Divider from '@material-ui/core/Divider';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
 import LinkIcon from '@material-ui/icons/Link';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import SaveIcon from '@material-ui/icons/Save';
@@ -19,35 +17,65 @@ import {
 
 import { ptBR } from 'date-fns/locale';
 
-import AddContentMenu from '../../components/AddContentMenu';
+// Componentes locais
 import ImagePicker from '../../components/ImagePicker';
-import RenderContent from '../../components/RenderContent';
+import TextEditor from '../../components/TextEditor';
 
+// Firebase
 import { db } from '../../config/firebaseConfig';
 
 import {
   Container,
-  Information,
   LargeInput,
   News,
   Save,
   SaveButton,
+  SmallInput,
+  TextInput,
 } from './styles';
 
+const initialText = [{ type: 'paragraph', children: [{ text: '' }] }];
+const initialSchools = [{ id: 'none', name: 'Nenhuma' }];
+
+const categories = [
+  {
+    type: 'empreendedorismo',
+    title: 'Empreendedorismo',
+  },
+  {
+    type: 'comunicacao',
+    title: 'Comunicação',
+  },
+  {
+    type: 'tecnologia',
+    title: 'Tecnologia',
+  },
+];
+
 export default function AddNews({ history }) {
-  const [values, setValues] = useState({
+  const [input, setInput] = useState({
     title: '',
     image: '',
-    category: 'empreendedorismo',
+    category: categories[0].type,
     link: '',
-    schoolId: 'none',
+    schoolId: initialSchools[0].id,
     tags: '',
     createdAt: new Date(),
   });
 
-  const [contents, setContent] = useState([]);
+  const [inputError, setInputError] = useState({
+    title: false,
+    image: false,
+    category: false,
+    link: false,
+    schoolId: false,
+    tags: false,
+    createdAt: false,
+  });
 
-  const [schools, setSchools] = useState([{ id: 'none', name: 'Nenhuma' }]);
+  const [text, setText] = useState(initialText);
+
+  const [schools, setSchools] = useState(initialSchools);
 
   /**
    * Busca as escolas
@@ -66,29 +94,13 @@ export default function AddNews({ history }) {
       });
   }, []);
 
-  const categories = [
-    {
-      type: 'empreendedorismo',
-      title: 'Empreendedorismo',
-    },
-    {
-      type: 'comunicacao',
-      title: 'Comunicação',
-    },
-    {
-      type: 'tecnologia',
-      title: 'Tecnologia',
-    },
-  ];
-
   /**
    * Salva o que o usuário modificou (title, image, category...)
    *
-   * @param {String} prop qual o item que está sendo alterado
    * @param {Event} event evento que contém o novo valor
    */
-  function handleChange(prop, event) {
-    setValues({ ...values, [prop]: event.target.value });
+  function handleChange(event) {
+    setInput({ ...input, [event.target.name]: event.target.value });
   }
 
   /**
@@ -97,73 +109,7 @@ export default function AddNews({ history }) {
    * @param {Date} date data
    */
   function handleTimeChange(date) {
-    setValues({ ...values, time: date });
-  }
-
-  /**
-   * Gerencia a mudança do conteúdo dos itens
-   *
-   * @param {String} key índice do item
-   * @param {Event} event evento relacionado ao componente (nome, valor)
-   */
-  function handleContentChange(key, event) {
-    let dummyState = [...contents];
-    dummyState[key][event.target.name] = event.target.value;
-    setContent(dummyState);
-  }
-
-  /**
-   * Adiciona um novo item
-   *
-   * @param {*} type tipo de item
-   */
-  function addNewContent(type) {
-    setContent([...contents, { [type]: '' }]);
-  }
-
-  /**
-   * Remove um item usando um índice
-   *
-   * @param {String} key índice do item
-   */
-  function removeContent(key) {
-    let dummyState = [...contents];
-    dummyState.splice(key, 1);
-    setContent(dummyState);
-  }
-
-  /**
-   * Move o item para certo índice
-   *
-   * @param {Number} from índice inicial
-   * @param {Number} to índice de destino
-   */
-  function moveContent(from, to) {
-    let dummyState = [...contents];
-    let aux = dummyState[to];
-    dummyState[to] = dummyState[from];
-    dummyState[from] = aux;
-    setContent(dummyState);
-  }
-
-  /**
-   * Renderiza o conteúdo (subtítulo, texto, imagem)
-   *
-   * @param {*} key índice/key do item
-   * @returns o componente
-   */
-  function renderContent(key) {
-    return (
-      <RenderContent
-        key={key}
-        index={parseInt(key, 10)}
-        content={contents[key]}
-        maxIndex={contents.length}
-        handleContentChange={(key, evt) => handleContentChange(key, evt)}
-        moveContent={moveContent}
-        removeContent={removeContent}
-      />
-    );
+    setInput({ ...input, createdAt: date });
   }
 
   /**
@@ -174,90 +120,101 @@ export default function AddNews({ history }) {
    * @returns id
    */
   function createId() {
-    let lowerTitle = values.title
+    let lowerTitle = input.title
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .replace(/ /g, '-')
       .replace(/[,.]/g, '');
 
-    let date = values.createdAt.toLocaleDateString().replace(/(\/)/g, '-');
+    let date = input.createdAt.toLocaleDateString().replace(/(\/)/g, '-');
     return date + '-' + lowerTitle;
   }
 
   /**
-   * Pega o primeiro elemento de texto para colocar no about do card
+   * Valida os campos de texto
    *
-   * @returns um objeto contento texto { texto: ' ... ' }
+   * @returns Boolean
    */
-  function getFirstText() {
-    let firstText = { texto: '' };
-    for (let i = 0; i < contents.length; i++) {
-      const element = Object.keys(contents[i])[0];
-      if (element === 'texto') {
-        firstText = contents[i]['texto'];
-        break;
+  function validateInputs() {
+    let valid = true;
+    let errors = {};
+    for (const value in input) {
+      if (Object.hasOwnProperty.call(input, value)) {
+        const element = input[value];
+        if (element) {
+          errors = { ...errors, [value]: false };
+        } else {
+          errors = { ...errors, [value]: true };
+          valid = false;
+        }
       }
     }
-    return firstText;
+    setInputError(errors);
+    return valid;
   }
 
   /**
    * Salva a noticia no Firestore
    */
   function saveNews() {
-    const { createdAt } = values;
-    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    const stringDate = createdAt.toLocaleDateString('pt-BR', dateOptions);
-    db.collection('noticias')
-      .add({
-        about: getFirstText(),
-        content: contents,
+    if (validateInputs()) {
+      const { createdAt } = input;
+      const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+      let stringDate = createdAt.toLocaleDateString('pt-BR', dateOptions);
+
+      const obj = {
+        about: text[0]?.children[0]?.text,
+        content: text,
         date: stringDate,
         id: createId(),
-        ...values,
-      })
-      .then(history.push('/noticias'));
+        ...input,
+      };
+
+      db.collection('noticias').add(obj).then(history.push('/noticias'));
+    } else {
+      window.scrollTo(0, 0);
+    }
   }
 
   return (
     <Container>
       <News>
         <LargeInput>
-          <TextField
+          <TextInput
             id={'title'}
-            label={'Título'}
-            style={{ margin: '8px' }}
-            required
-            fullWidth
+            name={'title'}
+            label={'Título da Notícia'}
             multiline
             rowsMax={4}
-            margin={'normal'}
-            variant={'outlined'}
-            value={values.title}
-            onChange={(e) => handleChange('title', e)}
+            error={inputError.title}
+            value={input.title}
+            onChange={handleChange}
           />
         </LargeInput>
 
         <LargeInput>
           <ImagePicker
             placeHolder={'Adicione a imagem principal'}
-            value={values.image}
-            onChange={(e) => handleChange('image', e)}
+            error={inputError.image}
+            value={input.image}
+            onChange={handleChange}
           />
         </LargeInput>
 
-        <Information>
+        <SmallInput>
           <TextField
             id={'category'}
+            name={'category'}
             label={'Categoria'}
             style={{ margin: '8px' }}
             select
             required
             fullWidth
             variant={'outlined'}
-            value={values.category}
-            onChange={(e) => handleChange('category', e)}
+            error={inputError.category}
+            value={input.category}
+            onChange={handleChange}
           >
             {categories.map(({ title, type }) => (
               <MenuItem key={type} value={type}>
@@ -265,19 +222,21 @@ export default function AddNews({ history }) {
               </MenuItem>
             ))}
           </TextField>
-        </Information>
+        </SmallInput>
 
-        <Information>
+        <SmallInput>
           <TextField
             id={'schoolId'}
+            name={'schoolId'}
             label={'Escola Relacionada'}
             style={{ margin: '8px' }}
             select
             required
             fullWidth
             variant={'outlined'}
-            value={values.schoolId}
-            onChange={(e) => handleChange('schoolId', e)}
+            error={inputError.schoolId}
+            value={input.schoolId}
+            onChange={handleChange}
           >
             {schools.map(({ id, name }) => (
               <MenuItem key={id} value={id}>
@@ -285,20 +244,17 @@ export default function AddNews({ history }) {
               </MenuItem>
             ))}
           </TextField>
-        </Information>
+        </SmallInput>
 
-        <Information>
-          <TextField
+        <SmallInput>
+          <TextInput
             id={'link'}
+            name={'link'}
             label={'Link URL'}
             placeholder={'www.link-da-noticia/123456'}
-            style={{ margin: '8px' }}
-            required
-            fullWidth
-            margin={'normal'}
-            variant={'outlined'}
-            value={values.link}
-            onChange={(e) => handleChange('link', e)}
+            error={inputError.link}
+            value={input.link}
+            onChange={handleChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position={'start'}>
@@ -307,20 +263,17 @@ export default function AddNews({ history }) {
               ),
             }}
           />
-        </Information>
+        </SmallInput>
 
-        <Information>
-          <TextField
+        <SmallInput>
+          <TextInput
             id={'tags'}
+            name={'tags'}
             label={'Tags'}
             placeholder={'ex: Palestra, Escola, Educação...'}
-            style={{ margin: '8px' }}
-            required
-            fullWidth
-            margin={'normal'}
-            variant={'outlined'}
-            value={values.tags}
-            onChange={(e) => handleChange('tags', e)}
+            error={inputError.tags}
+            value={input.tags}
+            onChange={handleChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position={'start'}>
@@ -329,30 +282,30 @@ export default function AddNews({ history }) {
               ),
             }}
           />
-        </Information>
+        </SmallInput>
 
-        <Information>
+        <SmallInput>
           <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
             <KeyboardDatePicker
               id={'date'}
+              name={'date'}
               autoOk
               variant={'inline'}
               inputVariant={'outlined'}
               label={'Data'}
               format={'dd/MM/yyyy'}
-              value={values.createdAt}
+              error={inputError.createdAt}
+              value={input.createdAt}
               style={{ margin: '8px' }}
               InputAdornmentProps={{ position: 'end' }}
               onChange={handleTimeChange}
             />
           </MuiPickersUtilsProvider>
-        </Information>
+        </SmallInput>
 
         <Divider style={{ margin: '16px 0px' }} />
 
-        {Object.keys(contents).map(renderContent)}
-
-        <AddContentMenu onClick={addNewContent} />
+        <TextEditor text={text} setText={setText} />
 
         <Save>
           <SaveButton
