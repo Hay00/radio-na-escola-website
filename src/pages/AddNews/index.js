@@ -9,7 +9,6 @@ import TextField from '@material-ui/core/TextField';
 import LinkIcon from '@material-ui/icons/Link';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import SaveIcon from '@material-ui/icons/Save';
-
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
@@ -23,6 +22,7 @@ import TextEditor from '../../components/TextEditor';
 
 // Firebase
 import { db } from '../../config/firebaseConfig';
+import Firebase from '../../utils/firebaseFunctions';
 
 import {
   Container,
@@ -36,7 +36,6 @@ import {
 
 const initialText = [{ type: 'paragraph', children: [{ text: '' }] }];
 const initialSchools = [{ id: 'none', name: 'Nenhuma' }];
-
 const categories = [
   {
     type: 'empreendedorismo',
@@ -52,7 +51,10 @@ const categories = [
   },
 ];
 
-export default function AddNews({ history }) {
+export default function AddNews({ history, location, match }) {
+  const edit = match.path === '/noticias/edit/:id';
+  const [docId, setDocId] = useState(location?.state?.docId || null);
+
   const [input, setInput] = useState({
     title: '',
     image: '',
@@ -81,18 +83,34 @@ export default function AddNews({ history }) {
    * Busca as escolas
    */
   useEffect(() => {
-    db.collection('escolas')
-      .orderBy('name', 'asc')
-      .get()
-      .then((querySnapshot) => {
-        const tempList = [];
-        tempList.push({ id: 'none', name: 'Nenhuma' });
-        querySnapshot.forEach((doc) => {
-          tempList.push(doc.data());
-        });
-        setSchools(tempList);
-      });
-  }, []);
+    async function getSchools() {
+      const data = await Firebase.getAllSchools();
+      data.unshift({ id: 'none', name: 'Nenhuma' });
+      setSchools(data);
+    }
+    async function fetchNews() {
+      let data = [];
+      if (docId) {
+        data = await Firebase.findNews(docId);
+      } else {
+        data = await Firebase.findNewsWithURL(match.params.id);
+        data = data[0];
+        setDocId(data.docId);
+      }
+      if (data) {
+        const date = new Date(new Date().constructor(data.createdAt));
+        const inputValues = { ...data, createdAt: date };
+        delete inputValues.content;
+        setInput(inputValues);
+        setText(data.content);
+      }
+    }
+
+    getSchools();
+    if (edit) {
+      fetchNews();
+    }
+  }, [docId, edit, match.params.id]);
 
   /**
    * Salva o que o usuário modificou (title, image, category...)
@@ -160,6 +178,7 @@ export default function AddNews({ history }) {
   function saveNews() {
     if (validateInputs()) {
       const { createdAt } = input;
+
       const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
       let stringDate = createdAt.toLocaleDateString('pt-BR', dateOptions);
 
@@ -171,7 +190,14 @@ export default function AddNews({ history }) {
         ...input,
       };
 
-      db.collection('noticias').add(obj).then(history.push('/noticias'));
+      if (edit) {
+        db.collection('noticias')
+          .doc(docId)
+          .update(obj)
+          .then(history.push('/noticias'));
+      } else {
+        db.collection('noticias').add(obj).then(history.push('/noticias'));
+      }
     } else {
       window.scrollTo(0, 0);
     }
@@ -195,6 +221,7 @@ export default function AddNews({ history }) {
 
         <LargeInput>
           <ImagePicker
+            id={'main-image'}
             placeHolder={'Adicione a imagem principal'}
             error={inputError.image}
             value={input.image}

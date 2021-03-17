@@ -8,7 +8,7 @@ export const Container = styled(Paper)`
 `;
 
 export const ToolBar = styled.div`
-  padding-bottom:8px;
+  padding-bottom: 8px;
   border-bottom: 2px solid #eee;
 `;
 
@@ -53,10 +53,12 @@ export const ListItem = styled.ul`
 
 export const H1 = styled.h1`
   margin-top: 1em;
+  margin-bottom: 8px;
 `;
 
 export const H2 = styled.h2`
   margin-top: 1em;
+  margin-bottom: 8px;
 `;
 
 export const ListNumber = styled.ol`

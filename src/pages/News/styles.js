@@ -18,10 +18,35 @@ export const Title = styled(Typography)`
   word-wrap: break-word;
 `;
 
-export const Text = styled(Typography)`
-  max-width: 100%;
-  padding-top: 10px;
-  word-wrap: break-word;
+export const H1 = styled.h1`
+  margin-top: 1em;
+  margin-bottom: 16px;
+`;
+
+export const H2 = styled.h2`
+  margin-top: 1em;
+  margin-bottom: 16px;
+`;
+
+export const Quote = styled.blockquote`
+  color: #999;
+  border-left: 2px solid #ddd;
+  padding-left: 1em;
+`;
+
+export const ListItem = styled.ul`
+  list-style: disc;
+  margin-top: 1em;
+  padding-left: 1em;
+`;
+
+export const ListNumber = styled.ol`
+  margin-top: 1em;
+  padding-left: 1em;
+`;
+
+export const Text = styled.p`
+  margin: 8px 0px;
 `;
 
 export const Image = styled.img`

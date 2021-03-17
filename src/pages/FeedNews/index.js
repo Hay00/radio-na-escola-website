@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from 'react';
 
-import NewsCard from '../../components/NewsCard';
-
-import Fab from '@material-ui/core/Fab';
-
-import AddIcon from '@material-ui/icons/Add';
-
+// Componentes material-ui
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
-import { db } from '../../config/firebaseConfig';
-
-import { CircularProgress } from '@material-ui/core';
-import { Container, ButtonContainer, NewsContainer } from './styles';
+// Link do router
 import { Link } from 'react-router-dom';
+
+// Componentes locais
+import NewsCard from '../../components/NewsCard';
+
+// Firebase
+import { db } from '../../config/firebaseConfig';
+import Firebase from '../../utils/firebaseFunctions';
+
+import { ButtonContainer, Container, NewsContainer } from './styles';
 
 export default function FeedNews() {
   const [news, setNews] = useState(null);
@@ -29,16 +33,11 @@ export default function FeedNews() {
    * Busca as notícias do firestore
    */
   useEffect(() => {
-    db.collection('noticias')
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then((snapshot) => {
-        const data = [];
-        snapshot.forEach((doc) => {
-          data.push({ docId: doc.id, ...doc.data() });
-        });
-        setNews(data);
-      });
+    async function getNews() {
+      const data = await Firebase.getAllNews();
+      setNews(data);
+    }
+    getNews();
   }, []);
 
   /**
@@ -79,7 +78,7 @@ export default function FeedNews() {
             color={'primary'}
             aria-label={'add'}
             component={Link}
-            to={'noticias/add-noticia'}
+            to={{ pathname: 'noticias/add' }}
           >
             <AddIcon />
             Nova Notícia

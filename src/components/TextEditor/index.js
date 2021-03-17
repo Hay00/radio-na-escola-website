@@ -23,7 +23,7 @@ import {
   withReact,
 } from 'slate-react';
 
-// Componentes locais
+// Componentes estilizados
 import {
   Button,
   Container,

@@ -1,12 +1,20 @@
-import React, { useCallback, useState, useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
-import { Typography, TextField, Button } from '@material-ui/core';
+// Componentes material-ui
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 
-import { Container, Form } from './styles';
+// Redirect da dom
+import { Redirect } from 'react-router-dom';
+
+// Contento da autenticação
+import { AuthContext } from '../../auth';
+
+// Auth do firebase
 import { auth } from '../../config/firebaseConfig';
 
-import { AuthContext } from '../../auth';
-import { Redirect } from 'react-router-dom';
+import { Container, Form } from './styles';
 
 export default function Login({ history }) {
   const [email, setEmail] = useState('');

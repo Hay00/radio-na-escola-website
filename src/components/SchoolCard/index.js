@@ -1,28 +1,27 @@
 import React from 'react';
 
-import {
-  CardActionArea,
-  CardContent,
-  Divider,
-  IconButton,
-} from '@material-ui/core';
-
+// Componentes material-ui
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardContent from '@material-ui/core/CardContent';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ShareIcon from '@material-ui/icons/Share';
 
+// Link do router
 import { Link } from 'react-router-dom';
 
 import { Actions, Container, Image, MyCard, Title } from './styles';
 
 export default function SchoolCard({ remove, content }) {
-  const { id, name, image, radioName } = content;
+  const { docId, id, name, image, radioName } = content;
   return (
     <Container>
       <MyCard>
         <CardActionArea
           component={Link}
-          to={{ pathname: `/escolas/${id}`, news: content }}
+          to={{ pathname: `/escolas/${id}`, state: { docId } }}
         >
           <Image src={image} alt={`Logo ${name}`} />
           <CardContent>
@@ -33,7 +32,14 @@ export default function SchoolCard({ remove, content }) {
         </CardActionArea>
         <Divider />
         <Actions>
-          <IconButton onClick={() => console.log('a')} aria-label={'edit'}>
+          <IconButton
+            component={Link}
+            to={{
+              pathname: `/escolas/edit/${id}`,
+              state: { docId },
+            }}
+            aria-label={'edit'}
+          >
             <EditIcon color={'primary'} />
           </IconButton>
           <IconButton onClick={remove} aria-label={'delete'}>

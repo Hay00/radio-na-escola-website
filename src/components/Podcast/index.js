@@ -1,9 +1,11 @@
 import React from 'react';
 
+// Componentes material-ui
 import DateFnsUtils from '@date-io/date-fns';
-
-import { IconButton, InputAdornment, TextField } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import TextField from '@material-ui/core/TextField';
+import DeleteIcon from '@material-ui/icons/Delete';
 import LinkIcon from '@material-ui/icons/Link';
 import {
   KeyboardDatePicker,
@@ -121,7 +123,7 @@ export default function Podcast({
         style={{ margin: 'auto' }}
         onClick={() => removePodcast(index)}
       >
-        <Delete color={'error'} />
+        <DeleteIcon color={'error'} />
       </IconButton>
     </Container>
   );

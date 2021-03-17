@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import Firebase from '../../utils/firebaseFunctions';
 
-import { Container, Input, PodcastContainer, Save, SaveButton } from './styles';
-import { Divider, Fab, TextField } from '@material-ui/core';
-import SaveIcon from '@material-ui/icons/Save';
+// Componentes material-ui
+import Divider from '@material-ui/core/Divider';
+import Fab from '@material-ui/core/Fab';
+import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
+import SaveIcon from '@material-ui/icons/Save';
+import React, { useEffect, useState } from 'react';
 
-import { db } from '../../config/firebaseConfig';
+// Componentes locais
 import Alert from '../../components/Alert';
 import ImagePicker from '../../components/ImagePicker';
 import Podcast from '../../components/Podcast';
 
-export default function AddSchool({ history }) {
+// Firebase
+import { db } from '../../config/firebaseConfig';
+
+import { Container, Input, PodcastContainer, Save, SaveButton } from './styles';
+
+export default function AddSchool({ history, location, match }) {
+  const edit = match.path === '/escolas/edit/:id';
+  const [docId, setDocId] = useState(location?.state?.docId || null);
+
   const [values, setValues] = useState({
     name: '',
     image: '',
@@ -21,6 +32,39 @@ export default function AddSchool({ history }) {
   const [podcasts, setPodcasts] = useState([]);
 
   const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+  useEffect(() => {
+    async function getSchools() {
+      let data = [];
+      if (docId) {
+        data = await Firebase.findSchool(docId);
+      } else {
+        data = await Firebase.findSchoolWithURL(match.params.id);
+        data = data[0];
+        setDocId(data.docId);
+      }
+
+      if (data) {
+        const obj = {
+          name: data.name,
+          image: data.image,
+          radioLink: data.radioLink,
+          radioName: data.radioName,
+        };
+        setValues(obj);
+        if (data.podcasts) {
+          const result = data.podcasts.map((element) => {
+            const date = new Date(new Date().constructor(element.createdAt));
+            return { ...element, createdAt: date };
+          });
+          setPodcasts(result);
+        }
+      }
+    }
+    if (edit) {
+      getSchools();
+    }
+  }, [docId, edit, match.params.id]);
 
   /**
    * Salva o que o usuário modificou (title, image, category...)
@@ -58,13 +102,19 @@ export default function AddSchool({ history }) {
    * Salva a escola no Firestore
    */
   function saveSchool() {
-    db.collection('escolas')
-      .add({
-        id: createId(),
-        podcasts: podcasts,
-        ...values,
-      })
-      .then(history.push('/escolas'));
+    const obj = {
+      id: createId(),
+      podcasts: podcasts,
+      ...values,
+    };
+    if (edit) {
+      db.collection('escolas')
+        .doc(docId)
+        .update(obj)
+        .then(history.push('/escolas'));
+    } else {
+      db.collection('escolas').add(obj).then(history.push('/escolas'));
+    }
   }
 
   /**

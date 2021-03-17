@@ -1,31 +1,30 @@
 import React from 'react';
 
-import {
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Divider,
-  IconButton,
-  Typography,
-} from '@material-ui/core';
-
+// Componentes material-ui
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ShareIcon from '@material-ui/icons/Share';
 
+// Link do router
 import { Link } from 'react-router-dom';
 
-import { About, Actions, MyCard, Container, Title } from './styles';
+import { About, Actions, Container, MyCard, Title } from './styles';
 
 export default function NewsCard({ remove, content }) {
-  const { id, title, image, about, tags } = content;
+  const { docId, id, title, image, about, tags } = content;
 
   return (
     <Container>
       <MyCard>
         <CardActionArea
           component={Link}
-          to={{ pathname: `/noticias/${id}`, news: content }}
+          to={{ pathname: `/noticias/${id}`, state: { docId } }}
         >
           <CardMedia style={{ paddingTop: '56.25%' }} image={image} />
           <CardContent>
@@ -50,7 +49,15 @@ export default function NewsCard({ remove, content }) {
           >
             {tags}
           </Typography>
-          <IconButton style={{ width: '10%' }} aria-label={'edit'}>
+          <IconButton
+            component={Link}
+            to={{
+              pathname: `/noticias/edit/${id}`,
+              state: { docId },
+            }}
+            style={{ width: '10%' }}
+            aria-label={'edit'}
+          >
             <EditIcon color={'primary'} />
           </IconButton>
           <IconButton onClick={remove} aria-label={'delete'}>

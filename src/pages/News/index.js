@@ -1,71 +1,141 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, CircularProgress, Divider } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 
-// Acesso ao Firestore
-import { db } from '../../config/firebaseConfig';
+// Componentes material-ui
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
+import EventIcon from '@material-ui/icons/Event';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 
-// Icons
-import { Event, LocalOffer } from '@material-ui/icons';
+// Firebase
+import Firebase from '../../utils/firebaseFunctions';
+
 import {
   Container,
-  NewsContainer,
-  Information,
   Content,
-  Title,
+  H1,
+  H2,
   Image,
+  Information,
+  ListItem,
+  ListNumber,
+  NewsContainer,
+  Quote,
   Text,
+  Title,
 } from './styles';
 
-export default function News({ match }) {
+export default function News({ location, match }) {
+  const docId = location?.state?.docId || null;
   const [news, setNews] = useState(null);
 
   /**
    * Busca a notícia pelo id da url
    */
   useEffect(() => {
-    db.collection('noticias')
-      .where('id', '==', match.params.id)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          setNews(doc.data());
-        });
-      });
-  }, [match.params]);
+    async function getNews() {
+      let data = [];
+      if (docId) {
+        data = await Firebase.findNews(docId);
+      } else {
+        data = await Firebase.findNewsWithURL(match.params.id);
+        data = data[0];
+      }
+      if (data) {
+        setNews(data);
+      }
+    }
+    getNews();
+  }, [docId, match.params]);
 
   /**
-   * Exibe o conteúdo a partir do seu tipo, se for uma imagem tem que retornar um <img/>
-   * já se for texto <Typography/>, assim por diante ...
+   * Monta o texto, podendo ser negrito, itálico e sublinhado
+   *
+   * @param {Object} content conteúdo a ser montado
+   * @returns
+   */
+  function textBuilder(content) {
+    return content.map(({ text, bold, italic, underline }, index) => {
+      if (bold) {
+        text = <strong>{text}</strong>;
+      }
+      if (italic) {
+        text = <em>{text}</em>;
+      }
+      if (underline) {
+        text = <u>{text}</u>;
+      }
+      return <span key={index}>{text}</span>;
+    });
+  }
+
+  /**
+   * Renderiza uma lista com itens
+   *
+   * @param {*} children conteúdo dentro da lista
+   * @param {Boolean} numbered essa lista é enumerada?
+   * @returns JSX
+   */
+  function List({ children, numbered }) {
+    if (numbered) {
+      return (
+        <ListNumber>
+          {children.map((item, i) => (
+            <li key={i}>
+              <p>{textBuilder(item.children)}</p>
+            </li>
+          ))}
+        </ListNumber>
+      );
+    }
+    return (
+      <ListItem>
+        {children.map((item, i) => (
+          <li key={i}>
+            <p>{textBuilder(item.children)}</p>
+          </li>
+        ))}
+      </ListItem>
+    );
+  }
+
+  /**
+   * Exibe o conteúdo a partir do seu tipo, se for uma imagem tem que retornar um <Image/>
+   * já se for texto <Text/>, assim por diante ...
    *
    * @param {String} type qual o tipo de conteúdo (texto,imagem,subtitulo...)
    * @param {String} content o conteúdo em si
-   * @param {Number} key key
    */
-  function componentProvider(type, content, key) {
+  function NewsBuilder({ content }) {
+    const { children, type } = content;
     switch (type) {
-      case 'subtitulo':
+      case 'paragraph':
         return (
-          <Typography key={key} variant="h6" gutterBottom>
-            {content}
-          </Typography>
-        );
-      case 'texto':
-        return (
-          <Text key={key} variant="body1" gutterBottom>
-            {content}
+          <Text variant="body1" gutterBottom>
+            {textBuilder(children)}
           </Text>
         );
       case 'image':
         return (
           <img
-            key={key}
             style={{ maxWidth: '100%', margin: '15px auto' }}
-            src={content.toString()}
+            src={content.url}
             alt={''}
           />
         );
+      case 'heading-one':
+        return <H1>{children[0].text}</H1>;
+      case 'heading-two':
+        return <H2>{children[0].text}</H2>;
+      case 'block-quote':
+        return <Quote>{textBuilder(children)}</Quote>;
+      case 'bulleted-list':
+        return <List>{children}</List>;
+      case 'numbered-list':
+        return <List numbered>{children}</List>;
+
       default:
-        console.log('\nTipo: ' + type + ' Valor: ' + content);
+        return null;
     }
   }
 
@@ -82,7 +152,7 @@ export default function News({ match }) {
             <Image src={image} alt={'Imagem da notícia'} />
           </div>
           <Information>
-            <LocalOffer style={{ paddingRight: '6px' }} />
+            <LocalOfferIcon style={{ paddingRight: '6px' }} />
             <Typography
               style={{ margin: 'auto 0px' }}
               variant="caption"
@@ -92,7 +162,7 @@ export default function News({ match }) {
             </Typography>
           </Information>
           <Information>
-            <Event style={{ paddingRight: '6px' }} />
+            <EventIcon style={{ paddingRight: '6px' }} />
             <Typography
               style={{ margin: 'auto 0px' }}
               variant="caption"
@@ -104,11 +174,9 @@ export default function News({ match }) {
           </Information>
           <Divider style={{ margin: '20px' }} />
           <Content>
-            {content.map((element, index) => {
-              const type = Object.keys(element).toString();
-              const values = Object.values(element);
-              return componentProvider(type, values, index);
-            })}
+            {content.map((content, index) => (
+              <NewsBuilder key={index} content={content} />
+            ))}
           </Content>
         </NewsContainer>
       </Container>

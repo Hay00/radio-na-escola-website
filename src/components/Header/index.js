@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 
+// Componentes material-ui
 import AppBar from '@material-ui/core/AppBar';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
@@ -8,10 +9,17 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import MenuIcon from '@material-ui/icons/Menu';
+import HomeIcon from '@material-ui/icons/Home';
+
+// Link do router
 import { Link as RouterLink } from 'react-router-dom';
+
+// Autenticação de user
 import { AuthContext } from '../../auth';
+
+// Firebase auth
 import { auth } from '../../config/firebaseConfig';
+
 import { LoginButton, User } from './styles';
 
 export default function Header() {
@@ -50,8 +58,10 @@ export default function Header() {
           style={{ marginRight: '16px' }}
           color={'inherit'}
           aria-label={'menu'}
+          component={RouterLink}
+          to={'/'}
         >
-          <MenuIcon />
+          <HomeIcon />
         </IconButton>
         <Typography style={{ marginLeft: '16px', textDecoration: 'underline' }}>
           <Link

@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react';
 
-import { Container, ButtonContainer, SchoolsContainer } from './styles';
-
-import { CircularProgress, Fab } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-
+// Componentes material-ui
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
-import { db } from '../../config/firebaseConfig';
-
+// Link do router
 import { Link } from 'react-router-dom';
+
+// Componentes locais
 import SchoolCard from '../../components/SchoolCard';
+
+// Firebase
+import { db } from '../../config/firebaseConfig';
+import Firebase from '../../utils/firebaseFunctions';
+
+import { ButtonContainer, Container, SchoolsContainer } from './styles';
 
 export default function FeedSchools() {
   const [schools, setSchools] = useState(null);
@@ -27,16 +33,11 @@ export default function FeedSchools() {
    * Buscando as escolas do firestore
    */
   useEffect(() => {
-    db.collection('escolas')
-      .orderBy('name', 'asc')
-      .get()
-      .then((snapshot) => {
-        const data = [];
-        snapshot.forEach((doc) => {
-          data.push({ docId: doc.id, ...doc.data() });
-        });
-        setSchools(data);
-      });
+    async function getSchools() {
+      const data = await Firebase.getAllSchools();
+      setSchools(data);
+    }
+    getSchools();
   }, []);
 
   /**
@@ -77,7 +78,7 @@ export default function FeedSchools() {
             color={'primary'}
             aria-label={'add'}
             component={Link}
-            to={'escolas/add-escola'}
+            to={{ pathname: 'escolas/add' }}
           >
             <AddIcon />
             Nova Escola
