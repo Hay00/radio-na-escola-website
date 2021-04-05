@@ -14,8 +14,8 @@ import { Link } from 'react-router-dom';
 
 import { Actions, Container, Image, MyCard, Title } from './styles';
 
-export default function SchoolCard({ remove, content }) {
-  const { docId, id, name, image, radioName } = content;
+export default function SchoolCard({ remove, content, onShare }) {
+  const { docId, id, name, image, radioName, radioLink } = content;
   return (
     <Container>
       <MyCard>
@@ -42,10 +42,12 @@ export default function SchoolCard({ remove, content }) {
           >
             <EditIcon color={'primary'} />
           </IconButton>
-          <IconButton onClick={remove} aria-label={'delete'}>
-            <DeleteIcon color={'error'} />
-          </IconButton>
-          <IconButton onClick={() => console.log('B')} aria-label={'share'}>
+          {remove && (
+            <IconButton onClick={remove} aria-label={'delete'}>
+              <DeleteIcon color={'error'} />
+            </IconButton>
+          )}
+          <IconButton onClick={() => onShare(radioLink)} aria-label={'share'}>
             <ShareIcon color={'primary'} />
           </IconButton>
         </Actions>

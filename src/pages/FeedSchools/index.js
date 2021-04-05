@@ -9,6 +9,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Fab from '@material-ui/core/Fab';
+import Snackbar from '@material-ui/core/Snackbar';
 import AddIcon from '@material-ui/icons/Add';
 
 // Link do router
@@ -27,7 +28,8 @@ export default function FeedSchools() {
   const [schools, setSchools] = useState(null);
 
   const [toRemove, setToRemove] = useState({ uid: null, id: null });
-  const [open, setOpen] = useState(false);
+  const [shoDialog, setShowDialog] = useState(false);
+  const [showSnackBar, setShowSnackBar] = useState(false);
 
   /**
    * Buscando as escolas do firestore
@@ -47,7 +49,7 @@ export default function FeedSchools() {
    * @param {String} id id padrão da escola
    */
   function openDialog(docId, id) {
-    setOpen(true);
+    setShowDialog(true);
     setToRemove({ uid: docId, id: id });
   }
 
@@ -66,7 +68,24 @@ export default function FeedSchools() {
    */
   function handleClose() {
     setToRemove({ uid: null, id: null });
-    setOpen(false);
+    setShowDialog(false);
+  }
+
+  /**
+   * Feca a snackbar
+   */
+  function closeSnackBar() {
+    setShowSnackBar(false);
+  }
+
+  /**
+   * Copia o link para a clipboard do usuário mostrando uma
+   * notificação ao copiar
+   * @param {String} link link a ser copiado
+   */
+  function onShare(link) {
+    navigator.clipboard.writeText(link);
+    setShowSnackBar(true);
   }
 
   if (schools) {
@@ -90,11 +109,12 @@ export default function FeedSchools() {
               key={value.id}
               remove={() => openDialog(value.docId, value.id)}
               content={value}
+              onShare={onShare}
             />
           ))}
         </SchoolsContainer>
         <Dialog
-          open={open}
+          open={shoDialog}
           onClose={handleClose}
           aria-labelledby={'alert-dialog-title'}
           aria-describedby={'alert-dialog-description'}
@@ -122,17 +142,20 @@ export default function FeedSchools() {
             </Button>
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          open={showSnackBar}
+          autoHideDuration={6000}
+          onClose={closeSnackBar}
+          message="Link copiado!"
+        />
       </Container>
     );
   } else {
     return (
       <Container>
         <CircularProgress
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-          }}
+          style={{ position: 'absolute', top: '50%', left: '50%' }}
           color={'primary'}
         />
       </Container>

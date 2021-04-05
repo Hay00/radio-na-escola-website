@@ -16,8 +16,8 @@ import { Link } from 'react-router-dom';
 
 import { About, Actions, Container, MyCard, Title } from './styles';
 
-export default function NewsCard({ remove, content }) {
-  const { docId, id, title, image, about, tags } = content;
+export default function NewsCard({ remove, content, onShare }) {
+  const { docId, id, title, image, about, tags, link } = content;
 
   return (
     <Container>
@@ -60,10 +60,16 @@ export default function NewsCard({ remove, content }) {
           >
             <EditIcon color={'primary'} />
           </IconButton>
-          <IconButton onClick={remove} aria-label={'delete'}>
-            <DeleteIcon color={'error'} />
-          </IconButton>
-          <IconButton style={{ width: '10%' }} aria-label={'share'}>
+          {remove && (
+            <IconButton onClick={remove} aria-label={'delete'}>
+              <DeleteIcon color={'error'} />
+            </IconButton>
+          )}
+          <IconButton
+            onClick={() => onShare(link)}
+            style={{ width: '10%' }}
+            aria-label={'share'}
+          >
             <ShareIcon color={'primary'} />
           </IconButton>
         </Actions>

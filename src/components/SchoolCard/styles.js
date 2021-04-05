@@ -40,4 +40,5 @@ export const About = styled(Typography)`
 export const Actions = styled(CardActions)`
   padding: 8px 16px;
   align-items: center;
+  justify-content: end;
 `;

@@ -9,6 +9,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Fab from '@material-ui/core/Fab';
+import Snackbar from '@material-ui/core/Snackbar';
 import AddIcon from '@material-ui/icons/Add';
 
 // Link do router
@@ -27,7 +28,8 @@ export default function FeedNews() {
   const [news, setNews] = useState(null);
 
   const [toRemove, setToRemove] = useState({ uid: null, id: null });
-  const [open, setOpen] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [showSnackBar, setShowSnackBar] = useState(false);
 
   /**
    * Busca as notícias do firestore
@@ -47,7 +49,7 @@ export default function FeedNews() {
    * @param {String} id id padrão da notícia
    */
   function openDialog(docId, id) {
-    setOpen(true);
+    setShowDialog(true);
     setToRemove({ uid: docId, id: id });
   }
 
@@ -58,15 +60,32 @@ export default function FeedNews() {
     db.collection('noticias').doc(toRemove.uid).delete();
     let newValues = news.filter((val) => val.id !== toRemove.id);
     setNews(newValues);
-    handleClose();
+    closeDialog();
   }
 
   /**
    * Fecha o modal
    */
-  function handleClose() {
+  function closeDialog() {
     setToRemove({ uid: null, id: null });
-    setOpen(false);
+    setShowDialog(false);
+  }
+
+  /**
+   * Feca a snackbar
+   */
+  function closeSnackBar() {
+    setShowSnackBar(false);
+  }
+
+  /**
+   * Copia o link para a clipboard do usuário mostrando uma
+   * notificação ao copiar
+   * @param {String} link link a ser copiado
+   */
+  function onShare(link) {
+    navigator.clipboard.writeText(link);
+    setShowSnackBar(true);
   }
 
   if (news) {
@@ -90,12 +109,13 @@ export default function FeedNews() {
               key={value.id}
               remove={() => openDialog(value.docId, value.id)}
               content={value}
+              onShare={onShare}
             />
           ))}
         </NewsContainer>
         <Dialog
-          open={open}
-          onClose={handleClose}
+          open={showDialog}
+          onClose={closeDialog}
           aria-labelledby={'alert-dialog-title'}
           aria-describedby={'alert-dialog-description'}
         >
@@ -110,7 +130,7 @@ export default function FeedNews() {
           </DialogContent>
           <DialogActions>
             <Button
-              onClick={handleClose}
+              onClick={closeDialog}
               variant={'contained'}
               color={'primary'}
               autoFocus
@@ -122,6 +142,13 @@ export default function FeedNews() {
             </Button>
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          open={showSnackBar}
+          autoHideDuration={6000}
+          onClose={closeSnackBar}
+          message="Link copiado!"
+        />
       </Container>
     );
   } else {
