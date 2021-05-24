@@ -49,6 +49,10 @@ const categories = [
     type: 'tecnologia',
     title: 'Tecnologia',
   },
+  {
+    type: 'outros',
+    title: 'Outros',
+  },
 ];
 
 export default function AddNews({ history, location, match }) {
