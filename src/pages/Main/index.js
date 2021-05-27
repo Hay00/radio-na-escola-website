@@ -7,7 +7,7 @@ import NewsCard from '../../components/NewsCard';
 import SchoolCard from '../../components/SchoolCard';
 import Firebase from '../../utils/firebaseFunctions';
 
-import { Container, Content, Title } from './styles';
+import { Container, Content, Title, Wrapper } from './styles';
 
 export default function Main() {
   const [news, setNews] = useState(null);
@@ -49,15 +49,19 @@ export default function Main() {
       <Container>
         <Content>
           <Title>Notícias</Title>
-          {news.map((value) => (
-            <NewsCard key={value.id} content={value} onShare={onShare} />
-          ))}
+          <Wrapper>
+            {news.map((value) => (
+              <NewsCard key={value.id} content={value} onShare={onShare} />
+            ))}
+          </Wrapper>
         </Content>
         <Content>
           <Title>Escolas</Title>
-          {schools.map((value) => (
-            <SchoolCard key={value.id} content={value} onShare={onShare} />
-          ))}
+          <Wrapper>
+            {schools.map((value) => (
+              <SchoolCard key={value.id} content={value} onShare={onShare} />
+            ))}
+          </Wrapper>
         </Content>
         <Snackbar
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

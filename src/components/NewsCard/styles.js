@@ -9,8 +9,7 @@ export const Container = styled.div`
 `;
 
 export const MyCard = styled(Card)`
-  max-width: 512px;
-  margin: 20px 20px;
+  max-width: 560px;
 `;
 
 export const Actions = styled(CardActions)`

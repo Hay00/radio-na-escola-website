@@ -70,6 +70,29 @@ export default function News({ location, match }) {
   }
 
   /**
+   * Gera o estilo do alinhamento de texto
+   *
+   * @param {String} type tipo de alinhamento
+   * @returns CSS
+   */
+  function getTextAlign(type) {
+    switch (type) {
+      case 'center':
+        return { textAlign: 'center' };
+      case 'right':
+        return { textAlign: 'right' };
+      case 'justify':
+        return {
+          textAlign: 'justify',
+          textJustify: 'inter-word',
+          whiteSpace: 'normal',
+        };
+      default:
+        return { textAlign: 'left' };
+    }
+  }
+
+  /**
    * Renderiza uma lista com itens
    *
    * @param {*} children conteúdo dentro da lista
@@ -82,7 +105,9 @@ export default function News({ location, match }) {
         <ListNumber>
           {children.map((item, i) => (
             <li key={i}>
-              <p>{textBuilder(item.children)}</p>
+              <p style={getTextAlign(item.textAlign)}>
+                {textBuilder(item.children)}
+              </p>
             </li>
           ))}
         </ListNumber>
@@ -92,7 +117,9 @@ export default function News({ location, match }) {
       <ListItem>
         {children.map((item, i) => (
           <li key={i}>
-            <p>{textBuilder(item.children)}</p>
+            <p style={getTextAlign(item.textAlign)}>
+              {textBuilder(item.children)}
+            </p>
           </li>
         ))}
       </ListItem>
@@ -107,14 +134,9 @@ export default function News({ location, match }) {
    * @param {String} content o conteúdo em si
    */
   function NewsBuilder({ content }) {
-    const { children, type } = content;
+    const { children, type, textAlign } = content;
+    const style = getTextAlign(textAlign);
     switch (type) {
-      case 'paragraph':
-        return (
-          <Text variant="body1" gutterBottom>
-            {textBuilder(children)}
-          </Text>
-        );
       case 'image':
         return (
           <img
@@ -123,19 +145,25 @@ export default function News({ location, match }) {
             alt={''}
           />
         );
-      case 'heading-one':
-        return <H1>{children[0].text}</H1>;
-      case 'heading-two':
-        return <H2>{children[0].text}</H2>;
       case 'block-quote':
-        return <Quote>{textBuilder(children)}</Quote>;
+        return <Quote style={style}>{textBuilder(children)}</Quote>;
+      case 'heading-one':
+        return <H1 style={style}>{children[0].text}</H1>;
+      case 'heading-two':
+        return <H2 style={style}>{children[0].text}</H2>;
+      case 'list-item':
+        return <li>{children}</li>;
       case 'bulleted-list':
         return <List>{children}</List>;
       case 'numbered-list':
         return <List numbered>{children}</List>;
 
       default:
-        return null;
+        return (
+          <Text style={style} variant="body1" gutterBottom>
+            {textBuilder(children)}
+          </Text>
+        );
     }
   }
 

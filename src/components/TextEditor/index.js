@@ -34,6 +34,7 @@ import {
   ListItem,
   ListNumber,
   Quote,
+  Separator,
   Text,
   ToolBar,
 } from './styles';
@@ -130,6 +131,25 @@ export default function TextEditor({ text, setText }) {
   }
 
   /**
+   * Verifica se o tipo de alinhamento está ativado ou não
+   *
+   * @param {Editor} editor editor usado
+   * @param {String} format o formato
+   * @returns Boolean
+   */
+  function isTextAlignActive(editor, format) {
+    const [match] = Editor.nodes(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        n.textAlign === format,
+    });
+
+    return !!match;
+  }
+
+  /**
+   * Verifica se o tipo de marcador está ativado ou não
    *
    * @param {Editor} editor editor usado
    * @param {String} format o formato
@@ -163,6 +183,35 @@ export default function TextEditor({ text, setText }) {
 
     if (!isActive && isList) {
       const block = { type: format, children: [] };
+      Transforms.wrapNodes(editor, block);
+    }
+  }
+
+  /**
+   * Muda o tipo de alinhamento do texto
+   * @param {Editor} editor editor usado
+   * @param {String} format o formato
+   */
+  function toggleTextAlign(editor, format) {
+    const isActive = isTextAlignActive(editor, format);
+
+    const isList = LIST_TYPES.includes(format);
+
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        LIST_TYPES.includes(
+          !Editor.isEditor(n) && SlateElement.isElement(n) && n.textAlign
+        ),
+      split: true,
+    });
+    const newProperties = {
+      textAlign: isActive ? 'left' : format,
+    };
+
+    Transforms.setNodes(editor, newProperties);
+
+    if (!isActive && isList) {
+      const block = { textAlign: format, children: [] };
       Transforms.wrapNodes(editor, block);
     }
   }
@@ -209,6 +258,30 @@ export default function TextEditor({ text, setText }) {
   };
 
   /**
+   * Gera o estilo do alinhamento de texto
+   *
+   * @param {String} type tipo de alinhamento
+   * @returns
+   */
+  function getTextAlign(type) {
+    switch (type) {
+      case 'center':
+        return { textAlign: 'center' };
+      case 'right':
+        return { textAlign: 'right' };
+      case 'justify':
+        return {
+          textAlign: 'justify',
+          textJustify: 'inter-word',
+          whiteSpace: 'normal',
+        };
+
+      default:
+        return { textAlign: 'left' };
+    }
+  }
+
+  /**
    * Renderiza os elementos do editor de texto
    *
    * @param {Object} attributes props do componente
@@ -217,24 +290,53 @@ export default function TextEditor({ text, setText }) {
    * @returns JSX
    */
   function Element({ attributes, children, element }) {
+    const textAlign = getTextAlign(element.textAlign);
     switch (element.type) {
       case 'block-quote':
-        return <Quote {...attributes}>{children}</Quote>;
-      case 'bulleted-list':
-        return <ListItem {...attributes}>{children}</ListItem>;
+        return (
+          <Quote style={textAlign} {...attributes}>
+            {children}
+          </Quote>
+        );
       case 'heading-one':
-        return <H1 {...attributes}>{children}</H1>;
+        return (
+          <H1 style={textAlign} {...attributes}>
+            {children}
+          </H1>
+        );
       case 'heading-two':
-        return <H2 {...attributes}>{children}</H2>;
+        return (
+          <H2 style={textAlign} {...attributes}>
+            {children}
+          </H2>
+        );
+      case 'bulleted-list':
+        return (
+          <ListItem style={textAlign} {...attributes}>
+            {children}
+          </ListItem>
+        );
       case 'list-item':
-        return <li {...attributes}>{children}</li>;
+        return (
+          <li style={textAlign} {...attributes}>
+            {children}
+          </li>
+        );
       case 'numbered-list':
-        return <ListNumber {...attributes}>{children}</ListNumber>;
+        return (
+          <ListNumber style={textAlign} {...attributes}>
+            {children}
+          </ListNumber>
+        );
       case 'image':
         const props = { attributes, children, element };
-        return <ImageElement {...props} />;
+        return <ImageElement style={textAlign} {...props} />;
       default:
-        return <Text {...attributes}>{children}</Text>;
+        return (
+          <Text style={textAlign} {...attributes}>
+            {children}
+          </Text>
+        );
     }
   }
 
@@ -270,19 +372,27 @@ export default function TextEditor({ text, setText }) {
    * @param {String} icon tipo de ícone
    * @returns JSX
    */
-  function Select({ isBlock, format, icon }) {
+  function Select({ isBlock, isAlign, format, icon }) {
     const editor = useSlate();
 
     let active = false;
     if (isBlock) {
       active = isBlockActive(editor, format);
+    } else if (isAlign) {
+      active = isTextAlignActive(editor, format);
     } else {
       active = isMarkActive(editor, format);
     }
 
     const onClick = (event) => {
       event.preventDefault();
-      isBlock ? toggleBlock(editor, format) : toggleMark(editor, format);
+      if (isBlock) {
+        toggleBlock(editor, format);
+      } else if (isAlign) {
+        toggleTextAlign(editor, format);
+      } else {
+        toggleMark(editor, format);
+      }
     };
 
     return (
@@ -332,17 +442,25 @@ export default function TextEditor({ text, setText }) {
           <Select format="bold" icon="format_bold" />
           <Select format="italic" icon="format_italic" />
           <Select format="underline" icon="format_underlined" />
-          <ImageButton />
+          <Select isBlock format="block-quote" icon="format_quote" />
+          <Separator />
           <Select isBlock format="heading-one" icon="looks_one" />
           <Select isBlock format="heading-two" icon="looks_two" />
-          <Select isBlock format="block-quote" icon="format_quote" />
+          <Separator />
+          <Select isAlign format="left" icon="format_align_left" />
+          <Select isAlign format="center" icon="format_align_center" />
+          <Select isAlign format="right" icon="format_align_right" />
+          <Select isAlign format="justify" icon="format_align_justify" />
+          <Separator />
+          <ImageButton />
+          <Separator />
           <Select isBlock format="numbered-list" icon="format_list_numbered" />
           <Select isBlock format="bulleted-list" icon="format_list_bulleted" />
         </ToolBar>
         <EditableArea
           renderElement={renderElement}
           renderLeaf={renderLeaf}
-          placeholder="Insira um texto aqui para criar uma notícia..."
+          placeholder="Insira um texto aqui..."
           spellCheck
           autoFocus
           onKeyDown={(event) => {

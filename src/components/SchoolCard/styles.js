@@ -8,8 +8,7 @@ export const Container = styled.div`
   }
 `;
 export const MyCard = styled(Card)`
-  width: 400px;
-  margin: 20px 20px;
+  max-width: 460px;
 `;
 
 export const Title = styled(Typography)`

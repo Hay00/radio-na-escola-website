@@ -1,4 +1,4 @@
-import { Paper } from '@material-ui/core';
+import { Divider, Paper } from '@material-ui/core';
 import { Editable } from 'slate-react';
 import styled from 'styled-components';
 
@@ -8,6 +8,10 @@ export const Container = styled(Paper)`
 `;
 
 export const ToolBar = styled.div`
+  width: 100%;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   padding-bottom: 8px;
   border-bottom: 2px solid #eee;
 `;
@@ -16,7 +20,7 @@ export const Button = styled.button`
   color: ${({ active }) => (active ? 'black' : '#ccc')};
   background-color: ${({ active }) => (active ? '#eee' : '#fff')};
 
-  margin-left: 15px;
+  margin-left: 4px;
   padding: 4px 4px 2px;
   border-radius: 4px;
   transition: background-color 0.1s ease-out;
@@ -24,6 +28,14 @@ export const Button = styled.button`
   &:hover {
     background-color: #eee;
   }
+`;
+
+export const Separator = styled(Divider).attrs(() => ({
+  orientation: 'vertical',
+  variant: 'middle',
+  flexItem: true,
+}))`
+  margin: 0px 6px 0px 8px;
 `;
 
 export const EditableArea = styled(Editable)`

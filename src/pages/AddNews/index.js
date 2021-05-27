@@ -142,15 +142,14 @@ export default function AddNews({ history, location, match }) {
    * @returns id
    */
   function createId() {
-    let lowerTitle = input.title
+    const identifier = input.title
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
+      .replace(/[^a-zA-Z0-9 ]/g, '')
       .replace(/ /g, '-')
-      .replace(/[,.]/g, '');
+      .toLowerCase();
 
     let date = input.createdAt.toLocaleDateString().replace(/(\/)/g, '-');
-    return date + '-' + lowerTitle;
+    return date + '-' + identifier;
   }
 
   /**

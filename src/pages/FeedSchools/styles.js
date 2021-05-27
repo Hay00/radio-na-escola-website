@@ -11,11 +11,14 @@ export const ButtonContainer = styled.div`
   margin-bottom: 10px;
 `;
 export const SchoolsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  grid-auto-rows: 560px;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
   @media (min-width: 768px) {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    margin: 0px 8vw;
+    margin: 0px 30px;
   }
 `;

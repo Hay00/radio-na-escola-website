@@ -18,3 +18,15 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+export const Wrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    margin: 0px 30px;
+  }
+`;

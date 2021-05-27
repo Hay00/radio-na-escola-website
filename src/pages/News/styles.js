@@ -18,16 +18,6 @@ export const Title = styled(Typography)`
   word-wrap: break-word;
 `;
 
-export const H1 = styled.h1`
-  margin-top: 1em;
-  margin-bottom: 16px;
-`;
-
-export const H2 = styled.h2`
-  margin-top: 1em;
-  margin-bottom: 16px;
-`;
-
 export const Quote = styled.blockquote`
   color: #999;
   border-left: 2px solid #ddd;
@@ -40,13 +30,23 @@ export const ListItem = styled.ul`
   padding-left: 1em;
 `;
 
+export const H1 = styled.h1`
+  margin-top: 1em;
+  margin-bottom: 8px;
+`;
+
+export const H2 = styled.h2`
+  margin-top: 1em;
+  margin-bottom: 8px;
+`;
+
 export const ListNumber = styled.ol`
   margin-top: 1em;
   padding-left: 1em;
 `;
 
 export const Text = styled.p`
-  margin: 8px 0px;
+  margin-top: 1em;
 `;
 
 export const Image = styled.img`
