@@ -83,6 +83,16 @@ export default function Header() {
             Escolas
           </Link>
         </Typography>
+        <Typography style={{ marginLeft: '16px', textDecoration: 'underline' }}>
+          <Link
+            color={'inherit'}
+            variant={'h6'}
+            component={RouterLink}
+            to={'/sobre'}
+          >
+            Projeto
+          </Link>
+        </Typography>
 
         {currentUser ? (
           <User>

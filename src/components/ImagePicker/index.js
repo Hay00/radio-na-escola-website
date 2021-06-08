@@ -8,6 +8,7 @@ export default function ImagePicker({
   placeHolder = 'Selecione uma Imagem',
   value,
   onChange,
+  avatar,
 }) {
   /**
    * Transforma a imagem selecionada para base64
@@ -23,8 +24,12 @@ export default function ImagePicker({
     }
   }
 
+  const imgSty = avatar
+    ? { width: 75, height: 75, objectFit: 'cover', borderRadius: '50%' }
+    : { width: '100%', objectFit: 'contain' };
+
   return (
-    <Container>
+    <Container avatar={!avatar}>
       <input
         accept="image/*"
         style={{ display: 'none' }}
@@ -36,15 +41,11 @@ export default function ImagePicker({
       <label htmlFor={`contained-button-file-${id}`}>
         {value.length > 0 ? (
           <Image>
-            <img
-              style={{ width: '75%', objectFit: 'contain' }}
-              alt={'Imagem Thumbnail'}
-              src={value}
-            />
+            <img style={imgSty} alt={'Imagem Thumbnail'} src={value} />
           </Image>
         ) : (
-          <Empty error={error}>
-            <p style={{ margin: '60px 30px' }}>{placeHolder}</p>
+          <Empty style={imgSty} error={error}>
+            {!avatar && <p style={{ margin: '60px 30px' }}>{placeHolder}</p>}
           </Empty>
         )}
       </label>
